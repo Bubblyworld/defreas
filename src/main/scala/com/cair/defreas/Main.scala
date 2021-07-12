@@ -14,15 +14,12 @@ case class ParserRequest(input: String)
 case class ParserResponse(error: Boolean)
 
 object Main extends IOApp {
-  // Globals.
   val appVersion = "DefReas 0.0.1"
 
   val service = HttpRoutes.of[IO] {
-    // Endpoint that returns the app version.
     case GET -> Root / "version" =>
       Ok(appVersion)
 
-    // Endpoint that parses KB files.
     case req @ POST -> Root / "parse" =>
       for {
         req <- req.as(implicitly, jsonOf[IO, ParserRequest])
