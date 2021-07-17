@@ -31,7 +31,7 @@ object Main extends IOApp {
   }
 
   def webServiceWithBlocker(blocker: Blocker): HttpRoutes[IO] =
-    webService[IO](FileService.Config("./web", blocker))
+    fileService[IO](FileService.Config("./web/dist", blocker))
 
   def appService(blocker: Blocker): HttpRoutes[IO] =
     webServiceWithBlocker(blocker)

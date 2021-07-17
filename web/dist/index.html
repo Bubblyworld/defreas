@@ -2,22 +2,24 @@
 <html lang="en">
   <head>
     <title>CAIR Defeasible Reasoning Platform</title>
-    <link rel="stylesheet" href="codemirror.css">
+    <link rel="stylesheet" href="reset.css">
     <style type="text/css" media="screen">
       body {
-        background-color: green;
+        background-color: lightgray;
+        width: 100vw;
+        height: 100vh;
       }
 
-      #editor-wrap {
+      .editor-center {
         display: flex;
         width: 100%;
         height: 100%;
         justify-content: center;
         align-items: center;
-
       }
 
-      #editor { 
+      .editor-wrap { 
+        background-color: white;
         width: 400px;
         height: 400px;
       }
@@ -25,17 +27,12 @@
   </head>
   
   <body>
-    <div id="editor-wrap">
-      <div id="editor" />
+    <div class="editor-center">
+      <div class="editor-wrap">
+        <div id="editor" />
+      </div>
     </div>
     
-    <script src="codemirror.js"></script>
-    <script src="javascript.js"></script>
-    <script>
-      var cm = CodeMirror(document.getElementById("editor"), {
-        mode: "javascript",
-        value: "var test = 1;"
-      });
-    </script>
+    <script src="main.js"></script>
   </body>
 </html>

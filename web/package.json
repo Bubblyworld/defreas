@@ -1,0 +1,28 @@
+{
+  "name": "defreas-web",
+  "version": "0.0.0",
+  "description": "Web interface for the DefReas defeasible reasoning framework.\"",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "defreas",
+    "web",
+    "defeasible",
+    "reasoning"
+  ],
+  "author": "Guy Paterson-Jones",
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "^5.62.0",
+    "lsp-editor-adapter": "0.0.10"
+  },
+  "devDependencies": {
+    "css-loader": "^6.0.0",
+    "style-loader": "^3.1.0",
+    "webpack": "^5.45.1",
+    "webpack-cli": "^4.7.2"
+  }
+}
