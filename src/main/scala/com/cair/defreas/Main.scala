@@ -30,11 +30,11 @@ object Main extends IOApp {
       } yield (res)
   }
 
-  def fileServiceWithBlocker(blocker: Blocker): HttpRoutes[IO] =
-    fileService[IO](FileService.Config("./assets", blocker))
+  def webServiceWithBlocker(blocker: Blocker): HttpRoutes[IO] =
+    webService[IO](FileService.Config("./web", blocker))
 
   def appService(blocker: Blocker): HttpRoutes[IO] =
-    fileServiceWithBlocker(blocker)
+    webServiceWithBlocker(blocker)
       .combineK(apiService)
   
   val app: Resource[IO, Server[IO]] =
