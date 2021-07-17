@@ -8,16 +8,18 @@ sealed trait PropositionalFormula extends LogicFormula {
   def id(): String = "propositional_logic"
 }
 
-// Base formula types - other connectives are expressed in terms of these.
-case class PropositionalAtom(label: String) extends PropositionalFormula
+/* AST type for a propositional atom. */
+final case class PropositionalAtom(label: String) extends PropositionalFormula
 
-case class PropositionalNegation(
+/* AST type for formula negation. */
+final case class PropositionalNegation(
   op: PropositionalFormula) extends PropositionalFormula
 
-case class PropositionalConjunction(opl: PropositionalFormula, 
+/* AST type for conjunctions of formulas. */
+final case class PropositionalConjunction(opl: PropositionalFormula, 
   opr: PropositionalFormula) extends PropositionalFormula
 
-// Derived formula types - aliases for combinations of conjunction/negation.
+/* Utility for disjunctions of formulas. */
 object PropositionalDisjunction extends PropositionalFormula {
   def apply(opl: PropositionalFormula, opr: PropositionalFormula) =
     PropositionalNegation(
@@ -26,6 +28,7 @@ object PropositionalDisjunction extends PropositionalFormula {
         PropositionalNegation(opr)))
 }
 
+/* Utility for formula implications. */
 object PropositionalImplication extends PropositionalFormula {
   def apply(opl: PropositionalFormula, opr: PropositionalFormula) =
     PropositionalDisjunction(
@@ -35,17 +38,20 @@ object PropositionalImplication extends PropositionalFormula {
 
 /** Parser for a simple propositional logic format, in which atoms are
  *  represented by strings of uppercase characters, negation is represented
- *  by '!' and conjunction is represented by '&'.
- */
+ *  by '!' and conjunction is represented by '&'. */
 object PropositionalParser extends LogicParser {
   def id() = "propositional_logic_simple"
+
   def parser() = atom | neg | conj
 
   def label = """[A-Z]+""".r ^^ { _.toString }
+
   def atom = label ^^ { PropositionalAtom(_) }
+
   def neg = "!" ~> "(" ~> atom <~ ")" ^^ {
     PropositionalNegation(_)
   }
+
   def conj = ("(" ~> atom <~ "^") ~ (atom <~ ")") ^^ {
     case opl ~ opr => PropositionalConjunction(opl, opr)
   }
