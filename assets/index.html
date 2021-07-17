@@ -1,14 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title></title>
-  <link href="style.css" rel="stylesheet" />
-</head>
-<body>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <head>
+    <title>CAIR Defeasible Reasoning Platform</title>
+    <link rel="stylesheet" href="codemirror.css">
+    <style type="text/css" media="screen">
+      body {
+        background-color: green;
+      }
 
-  <script>
-  </script>
-</body>
+      #editor-wrap {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+
+      }
+
+      #editor { 
+        width: 400px;
+        height: 400px;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <div id="editor-wrap">
+      <div id="editor" />
+    </div>
+    
+    <script src="codemirror.js"></script>
+    <script src="javascript.js"></script>
+    <script>
+      var cm = CodeMirror(document.getElementById("editor"), {
+        mode: "javascript",
+        value: "var test = 1;"
+      });
+    </script>
+  </body>
 </html>
