@@ -1,5 +1,6 @@
 // Codemirror embedded editor.
 import * as CodeMirror from 'codemirror';
+import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/show-hint';
 
@@ -13,8 +14,9 @@ const editorSelector = '#editor';
 let editor = CodeMirror(
   document.querySelector(editorSelector),
   {
-    value: 'hello world',
-    gutters: ['CodeMirror-lsp']
+    value: 'A & B',
+    gutters: ['CodeMirror-lsp'],
+    lineNumbers: true,
   }
 );
 
