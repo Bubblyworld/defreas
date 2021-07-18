@@ -5,8 +5,10 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "deploy-lsp-proxy": "npm run build-jar && npm run run-lsp-proxy",
+    "build-jar": "cd .. && sbt assembly && cd -",
     "build-web": "npx webpack",
-    "lsp-proxy": " cp ../target/scala-2.13/DefReaS-assembly-0.1.0-SNAPSHOT.jar $(npm root)/jsonrpc-ws-proxy/defreas.jar && cp servers.yml $(npm root)/jsonrpc-ws-proxy/servers.yml && npm explore jsonrpc-ws-proxy -- npm run prepare && npm explore jsonrpc-ws-proxy -- node dist/server.js --port 8081 --languageServers servers.yml"
+    "run-lsp-proxy": " cp ../target/scala-2.13/DefReaS-assembly-0.1.0-SNAPSHOT.jar $(npm root)/jsonrpc-ws-proxy/defreas.jar && cp servers.yml $(npm root)/jsonrpc-ws-proxy/servers.yml && npm explore jsonrpc-ws-proxy -- npm run prepare && npm explore jsonrpc-ws-proxy -- node dist/server.js --port 8081 --languageServers servers.yml"
   },
   "keywords": [
     "defreas",

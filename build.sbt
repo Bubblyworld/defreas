@@ -14,6 +14,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "DefReaS",
     scalacOptions += "-Xmixin-force-forwarders:false",
+    scalacOptions ++= Seq("-unchecked", "-deprecation"),
     libraryDependencies += scalaTest % Test,
     libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % spcVersion,
     libraryDependencies += "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % lsp4jVersion,

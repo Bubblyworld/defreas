@@ -15,13 +15,13 @@ class WorkspaceService extends LspWorkspaceService {
    *  options.
    */
   override def didChangeConfiguration(params: DidChangeConfigurationParams): Unit = {
-    println(s"Changed configuration: ${params.getSettings}")
+    //println(s"Changed configuration: ${params.getSettings}")
   }
 
   /** Sent by client when there are changes to the files watched by the client.
    *  This is irrelevant for our web-based reasoner interface.
    */
   override def didChangeWatchedFiles(params: DidChangeWatchedFilesParams): Unit = {
-    println(s"Changed watched files: ${params.getChanges}")
+    //println(s"Changed watched files: ${params.getChanges}")
   }
 }

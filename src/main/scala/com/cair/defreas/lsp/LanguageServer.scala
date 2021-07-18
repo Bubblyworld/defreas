@@ -30,23 +30,31 @@ class LanguageServer extends LspLanguageServer {
       .startListening()
 
   override def initialize(params: InitializeParams): CompletableFuture[InitializeResult] = {
-    return ().asInstanceOf[CompletableFuture[InitializeResult]]
+    //log("Call: LanguageServer/initialize");
+    val future = new CompletableFuture[InitializeResult]()
+    future.complete(new InitializeResult())
+
+    return future
   }
 
   override def getTextDocumentService(): TextDocumentService = {
+    //log("Call: LanguageServer/getTextDocumentService");
     return textDocumentService
   }
 
   override def getWorkspaceService(): WorkspaceService = {
+    //log("Call: LanguageServer/getWorkspaceService");
     return workspaceService
   }
 
   override def exit(): Unit = {
-    println("Exiting language server - bye!")
+    //log("Call: LanguageServer/exit");
+    //log("Exiting language server - bye!")
   }
 
   override def shutdown(): CompletableFuture[Object] = {
-    println("Shutting down language server...")
+    //log("Call: LanguageServer/shutdown");
+    //log("Shutting down language server...")
 
     val future: CompletableFuture[Object] = new CompletableFuture()
     future.complete(().asInstanceOf[Object])

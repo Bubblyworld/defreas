@@ -26,7 +26,7 @@ trait LogicParser extends RegexParsers {
 object LogicRegistry {
   private val registry: Map[String, LogicParser] = Map.empty
 
-  def register(parser: LogicParser): Unit = registry.addOne(parser.id -> parser)
+  def register(parser: LogicParser): Unit = registry.addOne(parser.id() -> parser)
   def lookup(id: String): Option[LogicParser] = registry.get(id)
 }
 
@@ -48,7 +48,7 @@ class Parser extends RegexParsers {
     case Pragma(value) => LogicRegistry.lookup(value) match {
       case None => failure(s"unknown logic parser: $value")
       case Some(logicParser) => {
-        rep(logicParser.parser.asInstanceOf[Parser[LogicFormula]])
+        rep(logicParser.parser().asInstanceOf[Parser[LogicFormula]])
       }
     }
   } <~ eof
