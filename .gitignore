@@ -3,3 +3,4 @@ target
 project
 .metals
 assets/codemirror
+.bloop

@@ -5,7 +5,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-web": "npx webpack",
+    "lsp-proxy": " cp ../target/scala-2.13/DefReaS-assembly-0.1.0-SNAPSHOT.jar $(npm root)/jsonrpc-ws-proxy/defreas.jar && cp servers.yml $(npm root)/jsonrpc-ws-proxy/servers.yml && npm explore jsonrpc-ws-proxy -- npm run prepare && npm explore jsonrpc-ws-proxy -- node dist/server.js --port 8081 --languageServers servers.yml"
   },
   "keywords": [
     "defreas",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "css-loader": "^6.0.0",
+    "jsonrpc-ws-proxy": "0.0.5",
     "style-loader": "^3.1.0",
     "webpack": "^5.45.1",
     "webpack-cli": "^4.7.2"

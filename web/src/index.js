@@ -20,3 +20,24 @@ let editor = CodeMirror(
   }
 );
 
+// Configuration for the language server proxy.
+let connectionOptions = {
+  // LSP proxy, can be run with npm scripts from the 'web' folder.
+  serverUri: 'ws://localhost:8081/defreas',
+  documentText: () => editor.getValue(),
+  languageId: 'defreas',
+
+  // Document URIs for our language server, currently irrelevant as it uses
+  // a virtual file system for editing, different one per process.
+  rootUri: 'file:///defreas/web',
+  documentUri: 'file:///defreas/web/knowledge_base.defreas',
+};
+
+// Connection to the language server proxy.
+let conn = new LspWsConnection(connectionOptions)
+  .connect(new WebSocket(connectionOptions.serverUri));
+
+// Configuration on the underlying editor.
+let adapter = new CodeMirrorAdapter(conn, {
+  quickSuggestionsDelay: 100,
+}, editor);

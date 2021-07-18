@@ -1,0 +1,6 @@
+langservers:
+  defreas:
+    - java
+    - -jar
+    - defreas.jar
+    - lsp
