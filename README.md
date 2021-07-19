@@ -11,9 +11,11 @@
     <a href="https://github.com/Bubblyworld/defreas/issues">Request Feature</a>
   </p>
   
-  [![Contributors][contributors-shield]][contributors-url]
-  [![Issues][issues-shield]][issues-url]
-  [![MIT License][license-shield]][license-url]
+  <div>
+    [![Contributors][contributors-shield]][contributors-url]
+    [![Issues][issues-shield]][issues-url]
+    [![MIT License][license-shield]][license-url]
+  </div>
 </p>
 
 <details open="open">
