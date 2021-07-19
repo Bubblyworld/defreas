@@ -7,13 +7,9 @@
     <img src="https://www.cair.org.za/themes/cair_sass/images/assets/logo.svg" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">DefReas</h3>
-
   <p align="center">
     A platform for reasoning over defeasible knowledge bases, brought to you by <a href="https://www.cair.org.za/about">CAIR</a>.
     <br />
-    <a href="https://github.com/Bubblyworld/defreas">View Demo</a>
-    ·
     <a href="https://github.com/Bubblyworld/defreas/issues">Report Bug</a>
     ·
     <a href="https://github.com/Bubblyworld/defreas/issues">Request Feature</a>
@@ -64,7 +60,7 @@ DefReas has the following moving parts:
 The servers are implemented in Scala using the SBT build tool, with the LSP server run behind [a reverse proxy](https://github.com/wylieconlon/jsonrpc-ws-proxy). The web interface is a simple javascript application containing an embedded CodeMirror editor.
 
 ### Prerequisites
-You'll need the following software installed to run a DefReas instance.
+You'll need the following software installed to run a DefReas instance:
 * [npm](https://www.npmjs.com/)
 * [scalac](https://scala-lang.org)
 * [sbt](https://www.scala-sbt.org/index.html)
@@ -104,8 +100,7 @@ The web interface can now be accessed at https://localhost:8080.
 Distributed under the MIT License.
 
 ## Contact
-Guy Paterson-Jones - email@example.com
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Guy Paterson-Jones - guy.paterson.jones@gmail.com
 
 <!-- Link variables -->
 [contributors-shield]: https://img.shields.io/github/contributors/Bubblyworld/defreas.svg?style=for-the-badge
@@ -114,4 +109,3 @@ Project Link: [https://github.com/your_username/repo_name](https://github.com/yo
 [issues-url]: https://github.com/Bubblyworld/defreas/issues
 [license-shield]: https://img.shields.io/github/license/Bubblyworld/defreas.svg?style=for-the-badge
 [license-url]: https://github.com/Bubblyworld/defreas/blob/master/LICENSE.txt
-[product-screenshot]: images/screenshot.png
