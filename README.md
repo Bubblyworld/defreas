@@ -1,7 +1,3 @@
-[![Contributors][contributors-shield]][contributors-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
 <p align="center">
   <a href="https://github.com/Bubblyworld/defreas">
     <img src="https://www.cair.org.za/themes/cair_sass/images/assets/logo.svg" alt="Logo" width="80" height="80">
@@ -14,6 +10,10 @@
     ·
     <a href="https://github.com/Bubblyworld/defreas/issues">Request Feature</a>
   </p>
+  
+  [![Contributors][contributors-shield]][contributors-url]
+  [![Issues][issues-shield]][issues-url]
+  [![MIT License][license-shield]][license-url]
 </p>
 
 <details open="open">
