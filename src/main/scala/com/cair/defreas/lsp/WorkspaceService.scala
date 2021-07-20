@@ -16,13 +16,13 @@ class WorkspaceService extends LspWorkspaceService with LazyLogging {
    *  options.
    */
   override def didChangeConfiguration(params: DidChangeConfigurationParams): Unit = {
-    logger.info(s"Changed configuration: ${params.getSettings}")
+    logger.info(s"WorkspaceService/didChangeConfiguration")
   }
 
   /** Sent by client when there are changes to the files watched by the client.
    *  This is irrelevant for our web-based reasoner interface.
    */
   override def didChangeWatchedFiles(params: DidChangeWatchedFilesParams): Unit = {
-    logger.info(s"Changed watched files: ${params.getChanges}")
+    logger.info(s"WorkspaceService/didChangeWatchedFiles")
   }
 }

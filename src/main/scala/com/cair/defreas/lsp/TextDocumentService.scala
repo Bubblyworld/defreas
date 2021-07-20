@@ -32,28 +32,23 @@ class TextDocumentService extends LspTextDocumentService with LazyLogging {
   }
 
   override def hover(params: HoverParams): CompletableFuture[Hover] = {
-    logger.info(s"Hover request: ${params.getPosition()}")
+    logger.info(s"TextDocumentService/hover: ${params.getPosition()}")
 
-    val future = new CompletableFuture[Hover]()
     val contents = new MarkupContent("plaintext", "Nothing to see yet...");
-    future.complete(new Hover(contents))
-
-    return future
+    return CompletableFuture.completedFuture(new Hover(contents))
   }
 
   type CompletionResult = Either[JList[CompletionItem], CompletionList]
   override def completion(params: CompletionParams): CompletableFuture[CompletionResult] = {
-    logger.info(s"Completion request: ${params.getPosition()}")
+    logger.info(s"TextDocumentService/completion")
 
-    val future = new CompletableFuture[CompletionResult]() 
     val ci = new CompletionItem("label")
     ci.setKind(CompletionItemKind.Text)
     ci.setDetail("detail")
     ci.setDocumentation("documentation")
     ci.setInsertText("insertText")
     ci.setInsertTextFormat(InsertTextFormat.PlainText)
-    future.complete(Either.forLeft(List(ci).asJava))
 
-    return future
+    return CompletableFuture.completedFuture(Either.forLeft(List(ci).asJava))
   }
 }

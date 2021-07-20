@@ -12,6 +12,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.CompletableFuture
 import com.typesafe.scalalogging._
+import scala.jdk.CollectionConverters._
 
 // https://github.com/eclipse/lsp4j/blob/master/org.eclipse.lsp4j/src/main/java/org/eclipse/lsp4j/services/LanguageServer.java
 //
@@ -31,38 +32,36 @@ class LanguageServer extends LspLanguageServer with LazyLogging {
       .startListening()
 
   override def initialize(params: InitializeParams): CompletableFuture[InitializeResult] = {
-    logger.info("Call: LanguageServer/initialize");
+    logger.info("LanguageServer/initialize");
 
-    val future = new CompletableFuture[InitializeResult]()
-    future.complete(new InitializeResult())
+    val serverCapabilities = new ServerCapabilities()
+    serverCapabilities.setHoverProvider(true)
+    serverCapabilities.setCompletionProvider(
+      new CompletionOptions(true, List("a", "b", "c").asJava))
 
-    return future
+    return CompletableFuture.completedFuture(
+      new InitializeResult(serverCapabilities))
   }
 
   override def getTextDocumentService(): TextDocumentService = {
-    logger.info("Call: LanguageServer/getTextDocumentService");
+    logger.info("LanguageServer/getTextDocumentService");
 
     return textDocumentService
   }
 
   override def getWorkspaceService(): WorkspaceService = {
-    logger.info("Call: LanguageServer/getWorkspaceService");
+    logger.info("LanguageServer/getWorkspaceService");
 
     return workspaceService
   }
 
   override def exit(): Unit = {
-    logger.info("Call: LanguageServer/exit");
-    logger.info("Exiting language server - bye!")
+    logger.info("LanguageServer/exit");
   }
 
   override def shutdown(): CompletableFuture[Object] = {
-    logger.info("Call: LanguageServer/shutdown");
-    logger.info("Shutting down language server...")
-
-    val future: CompletableFuture[Object] = new CompletableFuture()
-    future.complete(().asInstanceOf[Object])
-    return future
+    logger.info("LanguageServer/shutdown");
+    return CompletableFuture.completedFuture[Object](().asInstanceOf[Object])
   }
 }
 
