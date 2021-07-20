@@ -11,6 +11,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.CompletableFuture
+import com.typesafe.scalalogging._
 
 // https://github.com/eclipse/lsp4j/blob/master/org.eclipse.lsp4j/src/main/java/org/eclipse/lsp4j/services/LanguageServer.java
 //
@@ -20,7 +21,7 @@ import java.util.concurrent.CompletableFuture
 //    2) https://github.com/eclipse/lsp4j/issues/322 (expicit annotations)
 //    3) https://github.com/eclipse/lsp4j/issues/313 (no extends)
 //    4) https://github.com/eclipse/lsp4j/issues/127 (sbt workaround!)
-class LanguageServer extends LspLanguageServer {
+class LanguageServer extends LspLanguageServer with LazyLogging {
   val workspaceService = new WorkspaceService()
   val textDocumentService = new TextDocumentService()
 
@@ -30,7 +31,8 @@ class LanguageServer extends LspLanguageServer {
       .startListening()
 
   override def initialize(params: InitializeParams): CompletableFuture[InitializeResult] = {
-    //log("Call: LanguageServer/initialize");
+    logger.info("Call: LanguageServer/initialize");
+
     val future = new CompletableFuture[InitializeResult]()
     future.complete(new InitializeResult())
 
@@ -38,23 +40,25 @@ class LanguageServer extends LspLanguageServer {
   }
 
   override def getTextDocumentService(): TextDocumentService = {
-    //log("Call: LanguageServer/getTextDocumentService");
+    logger.info("Call: LanguageServer/getTextDocumentService");
+
     return textDocumentService
   }
 
   override def getWorkspaceService(): WorkspaceService = {
-    //log("Call: LanguageServer/getWorkspaceService");
+    logger.info("Call: LanguageServer/getWorkspaceService");
+
     return workspaceService
   }
 
   override def exit(): Unit = {
-    //log("Call: LanguageServer/exit");
-    //log("Exiting language server - bye!")
+    logger.info("Call: LanguageServer/exit");
+    logger.info("Exiting language server - bye!")
   }
 
   override def shutdown(): CompletableFuture[Object] = {
-    //log("Call: LanguageServer/shutdown");
-    //log("Shutting down language server...")
+    logger.info("Call: LanguageServer/shutdown");
+    logger.info("Shutting down language server...")
 
     val future: CompletableFuture[Object] = new CompletableFuture()
     future.complete(().asInstanceOf[Object])

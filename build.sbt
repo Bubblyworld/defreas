@@ -9,6 +9,8 @@ val spcVersion = "2.0.0"
 val lsp4jVersion = "0.12.0"
 val http4sVersion = "0.21.22"
 val circeVersion = "0.13.0"
+val logbackVersion = "1.2.4"
+val scalaLoggingVersion = "3.9.4"
 
 lazy val root = (project in file("."))
   .settings(
@@ -16,6 +18,8 @@ lazy val root = (project in file("."))
     scalacOptions += "-Xmixin-force-forwarders:false",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     libraryDependencies += scalaTest % Test,
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % logbackVersion,
+    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
     libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % spcVersion,
     libraryDependencies += "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % lsp4jVersion,
     libraryDependencies ++= Seq(
