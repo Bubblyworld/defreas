@@ -10,13 +10,11 @@
     ·
     <a href="https://github.com/Bubblyworld/defreas/issues">Request Feature</a>
   </p>
-  
-  <div>
-    [![Contributors][contributors-shield]][contributors-url]
-    [![Issues][issues-shield]][issues-url]
-    [![MIT License][license-shield]][license-url]
-  </div>
 </p>
+
+[![Contributors][contributors-shield]][contributors-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
 <details open="open">
   <summary>Table of Contents</summary>
