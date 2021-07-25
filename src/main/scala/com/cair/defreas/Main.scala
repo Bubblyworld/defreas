@@ -15,6 +15,9 @@ import scala.concurrent.ExecutionContext.global
 import scala.concurrent.duration._
 import lsp._
 
+import com.cair.defreas.types.Package
+import com.cair.defreas.logics.propositional
+
 case class ParserRequest(input: String)
 case class ParserResponse(error: Boolean)
 
@@ -70,4 +73,8 @@ object Main extends IOApp {
       ExitCode.Error
     }
   }
+
+  /** Returns every package that the tool can find. */
+  def getPackages(): List[Package] =
+    List(propositional.Package())
 }

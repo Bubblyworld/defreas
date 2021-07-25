@@ -4,14 +4,23 @@ package com.cair.defreas.types
  *  logics and reasoning functions that can be performed on the logics. */
 class Package(name: String) {
   private val taskMap = new NamespacedMap[String, TaskWrapper]()
+  private val syntaxMap = new NamespacedMap[String, Syntax]()
 
   /** Adds a Task instance to the package. */
-  def addTask[L : Logic, A, B](id: String, task: Task[L, A, B]): Unit =
-    taskMap.add[L](id, task)
+  def addTask[L : Logic, A, B](task: Task[L, A, B]): Unit =
+    taskMap.add[L](task.id(), task)
+
+  /** Adds a Syntax instance to the package. */
+  def addSyntax[L : Logic](syntax: Syntax[L]) =
+    syntaxMap.add[L](syntax.id(), syntax)
 
   /** Checks if there exists a Task with the given id in the package. */
   def hasTask[L : Logic](id: String): Boolean =
     taskMap.has[L](id)
+
+  /** Checks if there exists a Syntax with the given id in the package. */
+  def hasSyntax[L : Logic](id: String): Boolean =
+    syntaxMap.has[L](id)
 
   /** Runs the Task with the given id in the given context. */
   def runTask[L : Logic](id: String, handler: TaskHandler[L]): Unit =

@@ -8,6 +8,9 @@ class Task[L : Logic, A, B](id: String, fn: A => B)(
   implicit inputEvidence: TaskInput[L, A], outputEvidence: TaskOutput[L, B])
   extends TaskWrapper[L] {
 
+  def id(): String =
+    id
+
   // TODO handle errors
   def run(ctx: TaskContext[L]): TaskContext[L] = {
     val res = inputEvidence
