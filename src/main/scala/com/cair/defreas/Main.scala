@@ -1,55 +1,27 @@
 package com.cair.defreas
 
 import cats.effect._
-import cats.implicits._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import org.http4s._
-import org.http4s.circe._
-import org.http4s.dsl.io._
 import org.http4s.server._
 import org.http4s.server.blaze._
-import org.http4s.server.staticcontent._
 import org.http4s.implicits._
-import scala.concurrent.ExecutionContext.global
 import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.global
+
+import types.Package
+import logics.propositional
+import server.routes
 import lsp._
 
-import com.cair.defreas.types.Package
-import com.cair.defreas.logics.propositional
-
-case class ParserRequest(input: String)
-case class ParserResponse(error: Boolean)
-
 object Main extends IOApp {
-  val appVersion = "DefReas 0.0.1"
-
-  val apiService: HttpRoutes[IO] = HttpRoutes.of[IO] {
-    case GET -> Root / "version" =>
-      Ok(appVersion)
-
-    case req @ POST -> Root / "parse" =>
-      for {
-        req <- req.as(implicitly, jsonOf[IO, ParserRequest])
-        res <- Ok(ParserResponse(true).asJson)
-      } yield res
-  }
-
-  def webServiceWithBlocker(blocker: Blocker): HttpRoutes[IO] =
-    fileService[IO](FileService.Config("./web/dist", blocker))
-
-  def appService(blocker: Blocker): HttpRoutes[IO] =
-    webServiceWithBlocker(blocker)
-      .combineK(apiService)
-  
-  val app: Resource[IO, Server[IO]] =
+  val app: Resource[IO, Server[IO]] = {
     for {
       blocker <- Blocker[IO]
       server <- BlazeServerBuilder[IO](global)
         .bindHttp(8080, "localhost")
-        .withHttpApp(appService(blocker).orNotFound)
+        .withHttpApp(routes(blocker).orNotFound)
         .resource
     } yield server
+  }
 
   /** Runs the DefReas platform. Two commands are currently supported:
    *    1) 'web': serves the API and web platform on port 8080
