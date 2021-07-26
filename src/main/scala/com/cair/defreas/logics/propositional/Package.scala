@@ -8,6 +8,7 @@ object Package {
   def apply(): Package = {
     val pkg = new Package("propositional_logic")
     pkg.addSyntax[Logic](new Syntax("standard", Parser))
+    pkg.addTask[Logic, List[Logic], Boolean](Tasks.isSatisfiable)
 
     return pkg
   }

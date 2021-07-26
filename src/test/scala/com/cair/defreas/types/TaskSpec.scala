@@ -24,9 +24,8 @@ class TaskSpec extends AnyFlatSpec with should.Matchers {
     val task = new Task[TestLogic, Boolean, Boolean](
       "logical_not", !_)
 
-    var inputCtx = new TaskContext[TestLogic]()
+    var inputCtx = new TaskContext[TestLogic](false)
     var outputCtx = new TaskContext[TestLogic]()
-    inputCtx.bool = Option(false)
     task.unwrap(
       new TaskHandler[TestLogic] {
         def handle[A, B](task: Task[TestLogic, A, B]) = 

@@ -1,9 +1,8 @@
 package com.cair.defreas.types
 
-/** Represents a reasoning task that can be performed on a knowledge base,
- *  taking as input a knowledge base and additional value of type A (which
- *  may be the unit), and returning a value of type B. Task input and output 
- *  types are encoded using the simple type system defined by Type. */
+/** Represents a reasoning task that can be performed for a given logic,
+ *  taking as input a value of type A and returning as output a value of
+ *  type B. */
 class Task[L : Logic, A, B](id: String, fn: A => B)(
   implicit inputEvidence: TaskInput[L, A], outputEvidence: TaskOutput[L, B])
   extends TaskWrapper[L] {
@@ -39,10 +38,22 @@ trait TaskHandler[L] {
 }
 
 /** Represents a set of values that can be read from or written to by a Task. */
-class TaskContext[L]() {
-  var bool: Option[Boolean] = None
-  var formula: Option[L] = None
-  var knowledgeBase: Option[List[L]] = None
+case class TaskContext[L : Logic](
+  bool: Option[Boolean],
+  formula: Option[L],
+  knowledgeBase: Option[List[L]]
+) {
+  def this() =
+    this(None, None, None)
+
+  def this(bool: Boolean) =
+    this(Option(bool), None, None)
+
+  def this(formula: L) =
+    this(None, Option(formula), None)
+
+  def this(knowledgeBase: List[L]) =
+    this(None, None, Option(knowledgeBase))
 }
 
 /** Typeclass for possible Task input values. TaskInput values are given by
@@ -75,9 +86,7 @@ object TaskInstances {
   implicit def booleanTaskOutput[L : Logic]: TaskOutput[L, Boolean] =
     new TaskOutput[L, Boolean] {
       def write(value: Boolean): TaskContext[L] = {
-        val res = new TaskContext[L]()
-        res.bool = Option(value)
-        return res
+        return new TaskContext(value)
       }
     }
 }

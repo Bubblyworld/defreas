@@ -2,9 +2,12 @@ package com.cair.defreas.types
 
 /** Represents a collection of related logics, valid forms of syntax for those
  *  logics and reasoning functions that can be performed on the logics. */
-class Package(name: String) {
+class Package(id: String) {
   private val tasks = new NamespacedMap[String, TaskWrapper]()
   private val syntaxes = new NamespacedMap[String, Syntax]()
+
+  def id(): String =
+    id
 
   /** Adds a Task instance to the package. */
   def addTask[L : Logic, A, B](task: Task[L, A, B]): Unit =
