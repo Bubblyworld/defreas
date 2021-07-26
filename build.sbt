@@ -15,8 +15,15 @@ val scalaLoggingVersion = "3.9.4"
 lazy val root = (project in file("."))
   .settings(
     name := "DefReaS",
+
+    // For lenses and other cats typeclass stuff.
+    scalacOptions += "-Ymacro-annotations",
+
+    // For interop with LSP4J.
     scalacOptions += "-Xmixin-force-forwarders:false",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
+
+    // Libraries we use.
     libraryDependencies += scalaTest % Test,
     libraryDependencies += "ch.qos.logback" % "logback-classic" % logbackVersion,
     libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,

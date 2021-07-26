@@ -45,6 +45,25 @@ class PackageSpec extends AnyFlatSpec with should.Matchers {
     value3.get shouldBe value
   }
 
-  "A Package" should "support saving a task" in {
+  it should "support mapping over keys with a Handler instance" in {
+    val map = new NamespacedMap[String, TestF]()
+
+    val key = "test_key"
+    val value = TestF[TestLogic]()
+    map.add[TestLogic](key, value)
+
+    val key2 = "test_key2"
+    val value2 = TestF[TestLogic]()
+    map.add[TestLogic](key2, value2)
+
+    var res = List[String]()
+    map.map(new map.Handler {
+      def handle[L : Logic](id: String, value: TestF[L]): Unit =
+        res = res :+ id
+    })
+
+    res.length shouldBe 2
+    res.contains(key) shouldBe true
+    res.contains(key2) shouldBe true
   }
 }

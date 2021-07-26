@@ -3,33 +3,50 @@ package com.cair.defreas.types
 /** Represents a collection of related logics, valid forms of syntax for those
  *  logics and reasoning functions that can be performed on the logics. */
 class Package(name: String) {
-  private val taskMap = new NamespacedMap[String, TaskWrapper]()
-  private val syntaxMap = new NamespacedMap[String, Syntax]()
+  private val tasks = new NamespacedMap[String, TaskWrapper]()
+  private val syntaxes = new NamespacedMap[String, Syntax]()
 
   /** Adds a Task instance to the package. */
   def addTask[L : Logic, A, B](task: Task[L, A, B]): Unit =
-    taskMap.add[L](task.id(), task)
+    tasks.add[L](task.id(), task)
 
   /** Adds a Syntax instance to the package. */
   def addSyntax[L : Logic](syntax: Syntax[L]) =
-    syntaxMap.add[L](syntax.id(), syntax)
+    syntaxes.add[L](syntax.id(), syntax)
 
   /** Checks if there exists a Task with the given id in the package. */
   def hasTask[L : Logic](id: String): Boolean =
-    taskMap.has[L](id)
+    tasks.has[L](id)
 
   /** Checks if there exists a Syntax with the given id in the package. */
   def hasSyntax[L : Logic](id: String): Boolean =
-    syntaxMap.has[L](id)
+    syntaxes.has[L](id)
 
   /** Runs the Task with the given id in the given context. */
   def runTask[L : Logic](id: String, handler: TaskHandler[L]): Unit =
-    taskMap.get[L](id).map(_.unwrap(handler))
+    tasks.get[L](id).map(_.unwrap(handler))
+
+  /** Applies the given polymorphic handler to every known Task. */
+  def unwrapTasks(handler: PackageHandler): Unit =
+    tasks.map(new tasks.Handler {
+      def handle[L : Logic](id: String, wrappedTask: TaskWrapper[L]): Unit =
+        wrappedTask.unwrap(new TaskHandler[L] {
+          def handle[A, B](task: Task[L, A, B]): Unit =
+            handler.handle(task)
+        })
+    })
+}
+
+/** Runs a uniformly polymorphic function across all known tqsk instances,
+ *  for all known logics. Useful for constructing behaviours for every task,
+ *  such as REST handlers. */
+trait PackageHandler {
+  def handle[L : Logic, A, B](task: Task[L, A,B]): Unit
 }
 
 /** Represents a map of instances of F[L], where L is a universal logic type,
  *  indexed by the logic type and an instance of type K. */
-class NamespacedMap[K, F[L]] {
+private class NamespacedMap[K, F[L]] {
   import scala.collection.mutable.Map
 
   /* Map from a logic type L and an id of type K to an instance of F[L].
@@ -37,33 +54,44 @@ class NamespacedMap[K, F[L]] {
    * map value type should be F[Key.LogicT], rather than F[Key#LogicT], but 
    * there's no way to express this dependent type in Scala. We get around 
    * this by doing explicit (though logically safe) type casts. */
-  private val map = Map[Key, F[Key#LogicT]]()
+  private val data = Map[Key, F[Key#LogicT]]()
 
   def add[L : Logic](id: K, value: F[L]): Unit = {
     val key = makeKey[L](id)
-    map.addOne(key -> value.asInstanceOf[F[Key#LogicT]])
+    data.addOne(key -> value.asInstanceOf[F[Key#LogicT]])
   }
 
   def get[L : Logic](id: K): Option[F[L]] = {
     val key = makeKey[L](id)
-    map.get(key).map(_.asInstanceOf[F[L]])
+    data.get(key).map(_.asInstanceOf[F[L]])
   }
 
   def has[L : Logic](id: K): Boolean = {
     val key = makeKey[L](id)
-    map.contains(key)
+    data.contains(key)
+  }
+
+  def map(handler: Handler): Unit =
+    data.keys.map(_.handle(handler))
+
+  trait Handler {
+    def handle[L : Logic](id: K, value: F[L]): Unit
   }
 
   sealed private trait Key extends Equals {
     type LogicT
     val id: K
 
+    def handle(handler: Handler): Unit
     override def equals(that: Any): Boolean
   }
 
   private class InternalKey[L : Logic](_id: K) extends Key {
     type LogicT = L
     val id = _id
+
+    def handle(handler: Handler): Unit =
+      get[LogicT](id).map(handler.handle[LogicT](id, _))
 
     def canEqual(that: Any): Boolean =
       that.isInstanceOf[InternalKey[L]]
