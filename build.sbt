@@ -23,6 +23,10 @@ lazy val root = (project in file("."))
     scalacOptions += "-Xmixin-force-forwarders:false",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
+    // Generate semanticdb outputs on compile.
+    addCompilerPlugin("org.scalameta" %% "semanticdb-scalac" % "4.4.24" cross CrossVersion.full),
+    scalacOptions ++= Seq("-Yrangepos", "-P:semanticdb:text:on"),
+
     // Libraries we use.
     libraryDependencies += scalaTest % Test,
     libraryDependencies += "ch.qos.logback" % "logback-classic" % logbackVersion,
