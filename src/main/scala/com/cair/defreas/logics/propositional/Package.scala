@@ -1,14 +1,15 @@
 package com.cair.defreas.logics.propositional
 
 import com.cair.defreas.types.{ Logic => LogicT, _ }
+import com.cair.defreas.types.TaskInstances._
 
 import Instances._
 
 object Package {
   def apply(): Package = {
-    val pkg = new Package("propositional_logic")
-    pkg.addSyntax[Logic](new Syntax("standard", Parser))
-    pkg.addTask[Logic, List[Logic], Boolean](Tasks.isSatisfiable)
+    val pkg = new Package("stdlib_prop")
+    pkg.addSyntax(new Syntax("standard", StandardParser))
+    pkg.addTask(new Task("is_satisfiable", Tasks.isSatisfiable))
 
     return pkg
   }

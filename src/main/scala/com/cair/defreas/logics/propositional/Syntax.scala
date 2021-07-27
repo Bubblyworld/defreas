@@ -4,12 +4,15 @@ import com.cair.defreas.types.{ Logic => LogicT, Parser => ParserT, _ }
 
 import Instances._
 
-/** ParserT for a simple propositional logic format, in which atoms are
+/** Parser for a simple propositional logic syntax, in which atoms are
  *  represented by strings of uppercase characters, negation is represented
  *  by '!' and conjunction is represented by '&'. */
-object Parser extends ParserT[Logic] {
+object StandardParser extends ParserT[Logic] {
   def apply(program: String): Either[ParserError, Logic] =
-    ???
+    parseAll(formula, program) match {
+      case Success(res, _) => Right(res)
+      case err: NoSuccess => Left(new ParserError(err.msg))
+    }
 
   def label: Parser[String] = 
     """[A-Z]+""".r ^^ { _.toString }

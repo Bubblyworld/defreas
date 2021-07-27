@@ -11,23 +11,27 @@ class Package(id: String) {
 
   /** Adds a Task instance to the package. */
   def addTask[L : Logic, A, B](task: Task[L, A, B]): Unit =
-    tasks.add[L](task.id(), task)
+    tasks.add(task.id(), task)
 
   /** Adds a Syntax instance to the package. */
   def addSyntax[L : Logic](syntax: Syntax[L]) =
-    syntaxes.add[L](syntax.id(), syntax)
+    syntaxes.add(syntax.id(), syntax)
 
   /** Checks if there exists a Task with the given id in the package. */
   def hasTask[L : Logic](id: String): Boolean =
-    tasks.has[L](id)
+    tasks.has(id)
 
   /** Checks if there exists a Syntax with the given id in the package. */
   def hasSyntax[L : Logic](id: String): Boolean =
-    syntaxes.has[L](id)
+    syntaxes.has(id)
+
+  /** Returns the Syntax with the given id if it exists. */
+  def getSyntax[L : Logic](id: String): Option[Syntax[L]] =
+    syntaxes.get(id)
 
   /** Runs the Task with the given id in the given context. */
   def runTask[L : Logic](id: String, handler: TaskHandler[L]): Unit =
-    tasks.get[L](id).map(_.unwrap(handler))
+    tasks.get(id).map(_.unwrap(handler))
 
   /** Applies the given polymorphic handler to every known Task. */
   def unwrapTasks(handler: PackageHandler): Unit =

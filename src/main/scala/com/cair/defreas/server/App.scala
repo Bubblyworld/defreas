@@ -6,8 +6,12 @@ import org.http4s._
 
 import com.cair.defreas.types._
 
-object routes {
-  def apply(blocker: Blocker, packages: List[Package])(implicit cs: ContextShift[IO]): HttpRoutes[IO] =
+/** The combination of all API and static routes in a single app. */
+object App {
+  def apply(
+    blocker: Blocker,
+    packages: List[Package]
+  )(implicit cs: ContextShift[IO]): HttpRoutes[IO] =
     List(
       ApiRoutes(packages),
       StaticRoutes(blocker),

@@ -7,10 +7,10 @@ import org.http4s.implicits._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.global
 
+import com.cair.defreas.lsp._
+import com.cair.defreas.server.App
 import com.cair.defreas.types.Package
 import com.cair.defreas.logics.propositional
-import com.cair.defreas.server.routes
-import com.cair.defreas.lsp._
 
 object Main extends IOApp {
   val app: Resource[IO, Server[IO]] = {
@@ -18,7 +18,7 @@ object Main extends IOApp {
       blocker <- Blocker[IO]
       server <- BlazeServerBuilder[IO](global)
         .bindHttp(8080, "localhost")
-        .withHttpApp(routes(blocker, getPackages()).orNotFound)
+        .withHttpApp(App(blocker, getPackages()).orNotFound)
         .resource
     } yield server
   }

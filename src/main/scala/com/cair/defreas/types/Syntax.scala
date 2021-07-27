@@ -14,4 +14,7 @@ abstract class Parser[L : Logic] extends RegexParsers {
 }
 
 /** Represents a parsing error. */
-class ParserError(msg: String)
+case class ParserError(msg: String) {
+  override def toString(): String =
+    msg
+}
