@@ -1,0 +1,156 @@
+@startuml
+
+package "com.cair.defreas.types" {
+  interface Logic {
+    id : String
+    {method} ...
+  }
+
+  class Package {
+    tasks : Map[String, Task]
+    syntaxes : Map[String, Syntax]
+    run(taskID: String, ctx TaskContext): TaskContext
+  }
+
+  class Syntax {
+    id : String
+    parser : Parser 
+    printer : Printer
+    {method} ...
+  }
+
+  interface Parser {
+    parse(str : String): Either[Error, Logic]
+    ...
+  }
+
+  interface Printer {
+    print(formula: Logic): String
+    ...
+  }
+
+  class Task {
+    id : String
+    run(input: TaskInput): TaskOutput
+  }
+
+  class TaskContext {
+    bool  : Option[Boolean]
+    formula  : Option[Logic]
+    knowledgeBase : Option[List[Logic]]
+    {method} ...
+  }
+
+  interface TaskInput {
+    read(ctx: TaskContext): TaskInput
+    ...
+  }
+
+  interface TaskOutput {
+    write(value: TaskOutput): TaskContext
+    ...
+  }
+  
+  Syntax "1..*" *-- Package
+  Task "1..*" *-- Package
+  Parser *-- Syntax
+  Printer *-- Syntax
+  Logic o-- Parser
+  Logic o-- Printer
+  TaskInput o-- Task
+  TaskOutput o-- Task
+  TaskContext o-- TaskInput
+  TaskContext o-- TaskOutput
+  Logic o-- TaskContext
+}
+
+package "com.cair.defreas.lsp" {
+  abstract class LanguageServer {
+    capabilities: ServerCapabilities
+    workspaceService : WorkspaceService
+    textDocumentService : TextDocumentService
+    {method} ...
+  }
+
+  class DefreasLanguageServer {
+    syntaxes : List[Syntax]
+    {method} ...
+  }
+
+  class ServerCapabilities {
+    canMouseHover(): Boolean
+    canAutocomplete(): Boolean
+    ...
+  }
+
+  class WorkspaceService {
+    changedConfiguration(config: Configuration): Void
+    changedWatchedFiles(files: List[String]): Void
+    ...
+  }
+
+  class TextDocumentService {
+    openedFile(file: String, contents: String): Void
+    changedFile(file: String, contents: String): Void
+    closedFile(file: String): Void
+    savedFile(file: String): Void
+    handleMouseHover(pos: Position): Void
+    handleAutocomplete(pos: Position): String
+    ...
+  }
+
+  LanguageServer <|-- DefreasLanguageServer
+  Syntax "1..*" *-- DefreasLanguageServer
+  ServerCapabilities *-- LanguageServer
+  WorkspaceService *-- LanguageServer
+  TextDocumentService *-- LanguageServer
+}
+
+package "com.cair.defreas.server" {
+  class HttpServer {
+    staticRoute: StaticRoute
+    taskRoutes: List[TaskRoute]
+    listen(config: HttpConfiguration): Void
+  }
+
+  interface HttpRoute{
+    matches(req: HttpRequest): Boolean
+    serve(req: HttpRequest): HttpResponse
+    ...
+  }
+
+  class StaticRoute {
+    path: String
+    rootDir: String
+    {method} ...
+  }
+
+  class TaskRoute {
+    path: String
+    task: Task
+    syntax: Syntax
+    {method} ...
+  }
+
+  StaticRoute *-- HttpServer
+  TaskRoute "1..*" *-- HttpServer
+  HttpRoute <|-- StaticRoute
+  HttpRoute <|-- TaskRoute
+  Task *-- TaskRoute
+  Syntax *-- TaskRoute
+}
+
+package "com.cair.defreas" {
+  class Main {
+    packages: List[Package]
+    httpServer: HttpServer
+    languageServer: DefreasLanguageServer
+    main(args: List[String]): Void
+  }
+
+  DefreasLanguageServer *-- Main
+  HttpServer *-- Main
+  Package "1..*" *-- Main
+}
+
+@enduml
