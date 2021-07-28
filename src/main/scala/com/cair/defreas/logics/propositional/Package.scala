@@ -10,6 +10,7 @@ object Package {
     val pkg = new Package("stdlib_prop")
     pkg.addSyntax(new Syntax("standard", StandardParser))
     pkg.addTask(new Task("is_satisfiable", Tasks.isSatisfiable))
+    pkg.addTask(new Task("to_cnf", Tasks.toCNF))
 
     return pkg
   }

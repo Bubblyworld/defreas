@@ -9,4 +9,7 @@ object Tasks {
   // TODO: actual implementation
   val isSatisfiable: List[Logic] => Boolean =
     kb => true
+
+  val toCNF: List[Logic] => List[Logic] =
+    _.map(Util.toCNF)
 }

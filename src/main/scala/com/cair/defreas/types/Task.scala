@@ -85,8 +85,13 @@ object TaskInstances {
 
   implicit def booleanTaskOutput[L : Logic]: TaskOutput[L, Boolean] =
     new TaskOutput[L, Boolean] {
-      def write(value: Boolean): TaskContext[L] = {
-        return new TaskContext(value)
-      }
+      def write(value: Boolean): TaskContext[L] =
+        new TaskContext(value)
+    }
+
+  implicit def knowledgeBaseOutput[L : Logic]: TaskOutput[L, List[L]] =
+    new TaskOutput[L, List[L]] {
+      def write(value: List[L]): TaskContext[L] =
+        new TaskContext(value)
     }
 }
