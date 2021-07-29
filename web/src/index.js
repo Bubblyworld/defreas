@@ -26,7 +26,7 @@ const languageServerURL = "ws://localhost:8081/defreas";
 let editor = CodeMirror(
   document.getElementById(editorID),
   {
-    value: "A & B",
+    value: "A -> B | C",
     gutters: ["CodeMirror-lsp"],
     lineNumbers: true,
   }
@@ -90,7 +90,7 @@ window.runTask = function() {
       setResponseText("<b>Error:</b> " + res.err);
     } else {
       // TODO: handle different task output types - need to inspect tasks.
-      setResponseText("<b>Result:</b> " + res.context.bool);
+      setResponseText("<b>Result:</b> " + res.context.knowledgeBase);
     }
   };
 }
@@ -104,8 +104,8 @@ function fetchTaskEndpoints() {
   return [
     // TODO: fetch from API, for the demo we just hardcode.
     {
-      name: "is_satisfiable",
-      endpoint: apiServerURL + "/tasks/stdlib_prop/propositional_logic/is_satisfiable",
+      name: "to_cnf",
+      endpoint: apiServerURL + "/tasks/stdlib_prop/propositional_logic/to_cnf",
     }
   ];
 }

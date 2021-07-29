@@ -37,6 +37,7 @@ object StandardParser extends ParserT[Logic] {
   def wff2: Parser[Logic] =
     atom |
     ("!" ~> atom ^^ { Logic.neg(_) }) |
+    ("!(" ~> wff <~ ")") ^^ { Logic.neg(_) } |
     ("(" ~> wff <~ ")")
 
   def atom: Parser[Logic] = 

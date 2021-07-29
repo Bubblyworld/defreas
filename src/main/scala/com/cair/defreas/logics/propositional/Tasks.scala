@@ -8,7 +8,7 @@ import Instances._
 object Tasks {
   // TODO: actual implementation
   val isSatisfiable: List[Logic] => Boolean =
-    kb => true
+    _ => true
 
   val toCNF: List[Logic] => List[Logic] =
     _.map(Util.toCNF)

@@ -6,19 +6,29 @@ import com.cair.defreas.types.{ Logic => LogicT }
 sealed trait Logic
 
 /** Logic type for a propositional atom. */
-final case class Atom(label: String) extends Logic
+final case class Atom(label: String) extends Logic {
+  override def toString() = label
+}
 
 /** Logic type for negations of propositional formulas. */
-final case class Negation(op: Logic) extends Logic
+final case class Negation(op: Logic) extends Logic {
+  override def toString() = s"!${op}"
+}
 
 /** Logic type for conjunctions of propositional formulas. */
-final case class Conjunction(opl: Logic, opr: Logic) extends Logic
+final case class Conjunction(opl: Logic, opr: Logic) extends Logic {
+  override def toString() = s"(${opl} ^ ${opr})"
+}
 
 /** Logic type for disjunctions of propositional formulas. */
-final case class Disjunction(opl: Logic, opr: Logic) extends Logic
+final case class Disjunction(opl: Logic, opr: Logic) extends Logic {
+  override def toString() = s"(${opl} | ${opr})"
+}
 
 /** Logic type for implications of propositional formulas. */
-final case class Implication(opl: Logic, opr: Logic) extends Logic
+final case class Implication(opl: Logic, opr: Logic) extends Logic {
+  override def toString() = s"(${opl} -> ${opr})"
+}
 
 object Logic {
   def atom(label: String): Logic =
