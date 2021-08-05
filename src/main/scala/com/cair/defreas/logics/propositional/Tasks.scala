@@ -1,15 +1,18 @@
 package com.cair.defreas.logics.propositional
 
-import com.cair.defreas.types.{ Logic => LogicT, Parser => ParserT, _ }
-
-import Instances._
+import com.cair.defreas.types._
+import instances._
 
 /** Container for predefined propostional logic tasks. */
 object Tasks {
-  // TODO: actual implementation
-  val isSatisfiable: List[Logic] => Boolean =
-    _ => true
+  val isSatisfiable: List[PropositionalLogic] => Either[ExecutionError, Boolean] =
+    kb => Right(true)
 
-  val toCNF: List[Logic] => List[Logic] =
-    _.map(Util.toCNF)
+  val toCNF: List[PropositionalLogic] => Either[ExecutionError, List[PropositionalLogic]] =
+    kb => Right(kb.map(Util.toCNF))
+
+  val printInt = new Task[Int, String](
+    "print_int",
+    i => Right(i.toString())
+  )
 }

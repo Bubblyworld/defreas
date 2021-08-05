@@ -48,5 +48,5 @@ object Main extends IOApp {
 
   /** Returns every package that the tool can find. */
   def getPackages(): List[Package] =
-    List(propositional.Package())
+    List(propositional.getPackage())
 }

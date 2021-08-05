@@ -1,32 +1,38 @@
 package com.cair.defreas.logics.propositional
 
-import com.cair.defreas.types.{ Logic => LogicT, Parser => ParserT, _ }
+import scala.util.parsing.combinator._
 
-import Instances._
+import com.cair.defreas.types._
+import instances._
 
 /** Parser for a simple propositional logic syntax, in which atoms are
  *  represented by strings of uppercase characters, negation is represented
  *  by '!' and conjunction is represented by '^'. */
-object StandardParser extends ParserT[Logic] {
-  def apply(formulaStr: String): Either[ParserError, Logic] =
-    parseAll(wff, formulaStr) match {
-      case Success(res, _) => Right(res)
-      case err: NoSuccess => Left(new ParserError(err.msg))
+object DefaultSyntax extends Syntax[PropositionalLogic] with RegexParsers {
+  val id = "default"
+
+  def parse(str: String): Either[ParseError, PropositionalLogic] =
+    parse(phrase(wff), str) match {
+      case _ : NoSuccess => Left(ParseError("parsing failure in standard"))
+      case Success(formula, _) => Right(formula)
     }
+
+  def print(formula: PropositionalLogic): String =
+    formula.toString()
 
   def ident: Parser[String] = 
     """[a-zA-Z_]+""".r ^^ { _.toString }
 
-  def wff: Parser[Logic] =
+  def wff: Parser[PropositionalLogic] =
     wff1 ~ opt("->" ~> wff1) ^^ {
       case opl ~ None => opl
-      case opl ~ Some(opr) => Logic.implies(opl, opr)
+      case opl ~ Some(opr) => PropositionalLogic.implies(opl, opr)
     }
 
-  def wff1: Parser[Logic] = {
+  def wff1: Parser[PropositionalLogic] = {
     val subwff1 = 
-      ("^" ~> wff2 ^^ { x => Logic.and(_, x) }) | 
-      ("|" ~> wff2 ^^ { x => Logic.or(_, x) })
+      ("^" ~> wff2 ^^ { x => PropositionalLogic.and(_, x) }) | 
+      ("|" ~> wff2 ^^ { x => PropositionalLogic.or(_, x) })
 
     wff2 ~ opt(subwff1) ^^ {
       case opl ~ None => opl
@@ -34,12 +40,12 @@ object StandardParser extends ParserT[Logic] {
     }
   }
 
-  def wff2: Parser[Logic] =
+  def wff2: Parser[PropositionalLogic] =
     atom |
-    ("!" ~> atom ^^ { Logic.neg(_) }) |
-    ("!(" ~> wff <~ ")") ^^ { Logic.neg(_) } |
+    ("!" ~> atom ^^ { PropositionalLogic.neg(_) }) |
+    ("!(" ~> wff <~ ")") ^^ { PropositionalLogic.neg(_) } |
     ("(" ~> wff <~ ")")
 
-  def atom: Parser[Logic] = 
-    ident ^^ { Logic.atom(_) }
+  def atom: Parser[PropositionalLogic] = 
+    ident ^^ { PropositionalLogic.atom(_) }
 }

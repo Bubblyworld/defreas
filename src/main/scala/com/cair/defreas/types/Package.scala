@@ -1,121 +1,78 @@
 package com.cair.defreas.types
 
+import scala.reflect.runtime.universe._
+
 /** Represents a collection of related logics, valid forms of syntax for those
- *  logics and reasoning functions that can be performed on the logics. */
-class Package(id: String) {
-  private val tasks = new NamespacedMap[String, TaskWrapper]()
-  private val syntaxes = new NamespacedMap[String, Syntax]()
+ *  logics and reasoning functions that can be performed on the logics. Note
+ *  that Package instances are not referentially transparent, as they contain
+ *  mutable values. */
+sealed case class Package(
+  /** The identifier used to differentiate this package from others. */
+  id: String,
 
-  def id(): String =
-    id
-
+  tasks: Map[String, Task.Wrapper],
+  syntaxes: DependentMap[String, Syntax],
+) {
   /** Adds a Task instance to the package. */
-  def addTask[L : Logic, A, B](task: Task[L, A, B]): Unit =
-    tasks.add(task.id(), task)
+  def addTask(task: Task[_, _]): Package =
+    Package(id, tasks + (task.id -> task), syntaxes)
 
   /** Adds a Syntax instance to the package. */
-  def addSyntax[L : Logic](syntax: Syntax[L]) =
-    syntaxes.add(syntax.id(), syntax)
+  def addSyntax(syntax: Syntax[_]): Package =
+    Package(id, tasks, syntaxes + (syntax.id -> syntax))
 
   /** Checks if there exists a Task with the given id in the package. */
-  def hasTask[L : Logic](id: String): Boolean =
-    tasks.has(id)
+  def containsTask(id: String): Boolean =
+    tasks.contains(id)
 
   /** Checks if there exists a Syntax with the given id in the package. */
-  def hasSyntax[L : Logic](id: String): Boolean =
-    syntaxes.has(id)
+  def containsSyntax(id: String): Boolean =
+    syntaxes.contains(id)
 
-  /** Returns the Syntax with the given id if it exists. */
-  def getSyntax[L : Logic](id: String): Option[Syntax[L]] =
-    syntaxes.get(id)
-
-  /** Runs the Task with the given id in the given context. */
-  def runTask[L : Logic](id: String, handler: TaskHandler[L]): Unit =
-    tasks.get(id).map(_.unwrap(handler))
-
-  /** Applies the given polymorphic handler to every known Task. */
-  def unwrapTasks(handler: PackageHandler): Unit =
-    tasks.map(new tasks.Handler {
-      def handle[L : Logic](id: String, wrappedTask: TaskWrapper[L]): Unit =
-        wrappedTask.unwrap(new TaskHandler[L] {
-          def handle[A, B](task: Task[L, A, B]): Unit =
-            handler.handle(task)
-        })
-    })
-}
-
-/** Runs a uniformly polymorphic function across all known tqsk instances,
- *  for all known logics. Useful for constructing behaviours for every task,
- *  such as REST handlers. */
-trait PackageHandler {
-  def handle[L : Logic, A, B](task: Task[L, A,B]): Unit
-}
-
-/** Represents a map of instances of F[L], where L is a universal logic type,
- *  indexed by the logic type and an instance of type K. */
-private class NamespacedMap[K, F[L]] {
-  import scala.collection.mutable.Map
-
-  /* Map from a logic type L and an id of type K to an instance of F[L].
-   * Note that Key#LogicT is actually a more general type than we want: the
-   * map value type should be F[Key.LogicT], rather than F[Key#LogicT], but 
-   * there's no way to express this dependent type in Scala. We get around 
-   * this by doing explicit (though logically safe) type casts. */
-  private val data = Map[Key, F[Key#LogicT]]()
-
-  def add[L : Logic](id: K, value: F[L]): Unit = {
-    val key = makeKey[L](id)
-    data.addOne(key -> value.asInstanceOf[F[Key#LogicT]])
-  }
-
-  def get[L : Logic](id: K): Option[F[L]] = {
-    val key = makeKey[L](id)
-    data.get(key).map(_.asInstanceOf[F[L]])
-  }
-
-  def has[L : Logic](id: K): Boolean = {
-    val key = makeKey[L](id)
-    data.contains(key)
-  }
-
-  def map(handler: Handler): Unit =
-    data.keys.map(_.handle(handler))
-
-  trait Handler {
-    def handle[L : Logic](id: K, value: F[L]): Unit
-  }
-
-  sealed private trait Key extends Equals {
-    type LogicT
-    val id: K
-
-    def handle(handler: Handler): Unit
-    override def equals(that: Any): Boolean
-  }
-
-  private class InternalKey[L : Logic](_id: K) extends Key {
-    type LogicT = L
-    val id = _id
-
-    def handle(handler: Handler): Unit =
-      get[LogicT](id).map(handler.handle[LogicT](id, _))
-
-    def canEqual(that: Any): Boolean =
-      that.isInstanceOf[InternalKey[L]]
-
-    override def equals(that: Any): Boolean = {
-      if (!canEqual(that)) return false
-
-      val key = that.asInstanceOf[InternalKey[L]]
-      return this.id == key.id
+  /** Returns the task with the given id in type-erased form. To use the task, 
+   *  call task.unwrap() with an appropriate Task.Handler. */
+  def getTask(id: String): Either[NoSuchTaskError, Task.Wrapper] =
+    tasks.get(id) match {
+      case None => Left(NoSuchTaskError(this.id, id))
+      case Some(task) => Right(task)
     }
 
-    // This hashCode will cause collisions when there are tasks with the same
-    // id but different logic types. This shouldn't happen often in practice.
-    override def hashCode(): Int =
-      this.id.hashCode()
-  }
+  /** Returns the syntax with the given id in type-erased form. To use the
+   *  syntax, call syntax.unwrap() with an appropriate Syntax.Handler. */
+  def getSyntax(id: String): Either[NoSuchSyntaxError, Syntax.Wrapper] =
+    syntaxes.get(id) match {
+      case None => Left(NoSuchSyntaxError(this.id, id))
+      case Some(syntax) => Right(syntax)
+    }
 
-  private def makeKey[L : Logic](id: K): Key =
-    new InternalKey[L](id)
+  /** Returns the ids of all tasks contained in this package. */
+  def listTasks(): List[String] =
+    tasks.keys.toList
+
+  /** Returns the ids of all syntaxes for the given type. */
+  def listSyntaxes[A : TypeTag](): List[String] =
+    syntaxes.keys[A]
+}
+
+object Package {
+  def apply(id: String): Package =
+    new Package(id, Map.empty, DependentMap.empty)
+}
+
+/** An error that may occur while working with a Package. */
+sealed trait PackageError extends Error
+
+case class UnwrapTaskError(pkgID: String, taskID: String, err: TaskError) extends PackageError {
+  override def toString() =
+    s"error while unwrapping task '${taskID}' in package '${pkgID}': ${err}"
+}
+
+case class NoSuchTaskError(pkgID: String, taskID: String) extends PackageError {
+  override def toString() = 
+    s"no task with id '${taskID}' exists in package '${pkgID}'"
+}
+
+case class NoSuchSyntaxError(pkgID: String, syntaxID: String) extends PackageError {
+  override def toString() =
+    s"no syntax withid '${syntaxID}' exists in package '${pkgID}'"
 }

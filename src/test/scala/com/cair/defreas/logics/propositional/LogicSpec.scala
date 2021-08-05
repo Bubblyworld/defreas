@@ -3,8 +3,8 @@ package com.cair.defreas.logics.propositional
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
-import com.cair.defreas.types.{ Logic => _, _ }
-import Logic._
+import com.cair.defreas.types._
+import PropositionalLogic._
 
 class LogicSpec extends AnyFlatSpec with should.Matchers {
   "A PropositionalLogic" should "simplify formulas correctly" in {
@@ -21,7 +21,7 @@ class LogicSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "convert to CNF form correctly" in {
-    val testCases = List[(Logic, Logic)](
+    val testCases = List(
       //  Base cases:
       (atom("a"), atom("a")),
       (neg(atom("a")), neg(atom("a"))),

@@ -4,7 +4,7 @@ import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
 import com.cair.defreas.types._
-import Logic._
+import PropositionalLogic._
 
 class SyntaxSpec extends AnyFlatSpec with should.Matchers {
   "A StandardParser" should "correctly parse well-formed formulas" in {
@@ -29,7 +29,7 @@ class SyntaxSpec extends AnyFlatSpec with should.Matchers {
     )
 
     for ((str, wff) <- wffs) {
-      val res = StandardParser.apply(str)
+      val res = DefaultSyntax.parse(str)
       res.getOrElse(atom("ERROR")) shouldBe wff
     }
   }
@@ -48,8 +48,8 @@ class SyntaxSpec extends AnyFlatSpec with should.Matchers {
     )
 
     for (iff <- iffs) {
-      val res = StandardParser.apply(iff)
-      res shouldBe a [Left[ParserError, _]]
+      val res = DefaultSyntax.parse(iff)
+      res shouldBe a [Left[ParseError, _]]
     }
   }
 }

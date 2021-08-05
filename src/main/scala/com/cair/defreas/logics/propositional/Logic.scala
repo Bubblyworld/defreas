@@ -1,69 +1,69 @@
 package com.cair.defreas.logics.propositional
 
-import com.cair.defreas.types.{ Logic => LogicT }
+import com.cair.defreas.types._
 
-/** Represents an Logic for propositional logic. */
-sealed trait Logic
+/** Represents an PropositionalLogic for propositional logic. */
+sealed trait PropositionalLogic
 
-/** Logic type for a propositional atom. */
-final case class Atom(label: String) extends Logic {
+/** PropositionalLogic type for a propositional atom. */
+final case class Atom(label: String) extends PropositionalLogic {
   override def toString() = label
 }
 
-/** Logic type for negations of propositional formulas. */
-final case class Negation(op: Logic) extends Logic {
+/** PropositionalLogic type for negations of propositional formulas. */
+final case class Negation(op: PropositionalLogic) extends PropositionalLogic {
   override def toString() = s"!${op}"
 }
 
-/** Logic type for conjunctions of propositional formulas. */
-final case class Conjunction(opl: Logic, opr: Logic) extends Logic {
+/** PropositionalLogic type for conjunctions of propositional formulas. */
+final case class Conjunction(opl: PropositionalLogic, opr: PropositionalLogic) extends PropositionalLogic {
   override def toString() = s"(${opl} ^ ${opr})"
 }
 
-/** Logic type for disjunctions of propositional formulas. */
-final case class Disjunction(opl: Logic, opr: Logic) extends Logic {
+/** PropositionalLogic type for disjunctions of propositional formulas. */
+final case class Disjunction(opl: PropositionalLogic, opr: PropositionalLogic) extends PropositionalLogic {
   override def toString() = s"(${opl} | ${opr})"
 }
 
-/** Logic type for implications of propositional formulas. */
-final case class Implication(opl: Logic, opr: Logic) extends Logic {
+/** PropositionalLogic type for implications of propositional formulas. */
+final case class Implication(opl: PropositionalLogic, opr: PropositionalLogic) extends PropositionalLogic {
   override def toString() = s"(${opl} -> ${opr})"
 }
 
-object Logic {
-  def atom(label: String): Logic =
+object PropositionalLogic {
+  def atom(label: String): PropositionalLogic =
     new Atom(label)
 
-  def neg(op: Logic): Logic =
+  def neg(op: PropositionalLogic): PropositionalLogic =
     new Negation(op)
 
-  def and(opl: Logic, opr: Logic): Logic =
+  def and(opl: PropositionalLogic, opr: PropositionalLogic): PropositionalLogic =
     new Conjunction(opl, opr)
 
-  def or(opl: Logic, opr: Logic): Logic =
+  def or(opl: PropositionalLogic, opr: PropositionalLogic): PropositionalLogic =
     new Disjunction(opl, opr)
 
-  def implies(opl: Logic, opr: Logic): Logic =
+  def implies(opl: PropositionalLogic, opr: PropositionalLogic): PropositionalLogic =
     new Implication(opl, opr)
 
-  def equiv(opl: Logic, opr: Logic): Logic =
+  def equiv(opl: PropositionalLogic, opr: PropositionalLogic): PropositionalLogic =
     and(implies(opl, opr), implies(opr, opl))
 }
 
 /** Typeclass instances for propositional logic. */
-object Instances {
-  implicit val logicInstance: LogicT[Logic] =
-    new LogicT[Logic] {
+object instances {
+  implicit val logicInstance: Logic[PropositionalLogic] =
+    new Logic[PropositionalLogic] {
       val id: String = "propositional_logic"
     }
 }
 
 /** Utility functions for manipulating propositional formulas. */
 object Util {
-  import Logic._
+  import PropositionalLogic._
 
   /** Converts a propositional formula to conjunctive normal form. */
-  def toCNF(formula: Logic): Logic =
+  def toCNF(formula: PropositionalLogic): PropositionalLogic =
     simplify(formula, false) match {
       case Atom(l) => atom(l)
       case Negation(a) => neg(a)
@@ -80,7 +80,7 @@ object Util {
     }
 
   /** Returns equivalent with no implications and only atomic negations. */
-  def simplify(formula: Logic, negating: Boolean): Logic =
+  def simplify(formula: PropositionalLogic, negating: Boolean): PropositionalLogic =
     formula match {
       case Atom(l) => if (negating) neg(atom(l)) else atom(l)
       case Negation(a) => simplify(a, !negating)

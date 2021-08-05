@@ -5,34 +5,34 @@ import org.scalatest.matchers._
 
 class TaskSpec extends AnyFlatSpec with should.Matchers {
   // Example logic AST for testing.
-  case class TestLogic() {}
-  implicit val testLogicInstance: Logic[TestLogic] =
-    new Logic[TestLogic] {
-      val id = "test_logic"
-    }
+  //case class TestLogic() {}
+  //implicit val testLogicInstance: Logic[TestLogic] =
+  //  new Logic[TestLogic] {
+  //    val id = "test_logic"
+  //  }
 
-  "A Task" should "be creatable with implicit Input/Output instances" in {
-    import TaskInstances._
+  //"A Task" should "be creatable with implicit Input/Output instances" in {
+  //  import TaskInstances._
 
-    val task = new Task[TestLogic, List[TestLogic], Boolean](
-      "return_true", _ => true)
-  }
+  //  val task = new Task[TestLogic, List[TestLogic], Boolean](
+  //    "return_true", _ => true)
+  //}
 
-  it should "be runnable existentially with a TaskHandler" in {
-    import TaskInstances._
+  //it should "be runnable existentially with a TaskHandler" in {
+  //  import TaskInstances._
 
-    val task = new Task[TestLogic, Boolean, Boolean](
-      "logical_not", !_)
+  //  val task = new Task[TestLogic, Boolean, Boolean](
+  //    "logical_not", !_)
 
-    var inputCtx = new TaskContext[TestLogic](false)
-    var outputCtx = new TaskContext[TestLogic]()
-    task.unwrap(
-      new TaskHandler[TestLogic] {
-        def handle[A, B](task: Task[TestLogic, A, B]) = 
-          outputCtx = task.run(inputCtx) // TODO use ValueSet
-      })
+  //  var inputCtx = new TaskContext[TestLogic](false)
+  //  var outputCtx = new TaskContext[TestLogic]()
+  //  task.unwrap(
+  //    new TaskHandler[TestLogic] {
+  //      def handle[A, B](task: Task[TestLogic, A, B]) = 
+  //        outputCtx = task.run(inputCtx) // TODO use ValueSet
+  //    })
 
-    outputCtx.bool shouldBe a [Some[_]]
-    outputCtx.bool.get shouldBe true
-  }
+  //  outputCtx.bool shouldBe a [Some[_]]
+  //  outputCtx.bool.get shouldBe true
+  //}
 }
