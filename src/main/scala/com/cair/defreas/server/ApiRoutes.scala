@@ -20,21 +20,27 @@ object ApiRoutes {
     pkgs.flatMap(packageRoutes) :+ versionRoute()
 
   /** Route that returns the version of the tool. */
-  def versionRoute(): HttpRoutes[IO] =
+  def versionRoute(): HttpRoutes[IO] = {
+    println("/version (GET)")
+
     HttpRoutes.of[IO] {
       case GET -> Root / "version" => 
         Ok(appVersion)
     }
+  }
 
   /** Combined routes for the given package. */
-  def packageRoutes(pkg: Package): List[HttpRoutes[IO]] =
-    pkg
+  def packageRoutes(pkg: Package): List[HttpRoutes[IO]] = {
+    println(s"/packages/${pkg.id}")
+
+    return pkg
       .listTasks()
       .flatMap(taskRoutes(pkg, _))
+  }
 
   /** Combined routes for the given task. */
   def taskRoutes(pkg: Package, taskID: String): List[HttpRoutes[IO]] =
-    pkg.getTask(taskID) match {
+    return pkg.getTask(taskID) match {
       case Left(notFound) => List.empty
       case Right(taskWrapper) =>
         taskWrapper.unwrap(
@@ -52,11 +58,14 @@ object ApiRoutes {
   def taskRequirementsRoute[A : Value, B : Value](
     pkg: Package,
     task: Task[A, B]
-  ): HttpRoutes[IO] =
+  ): HttpRoutes[IO] = {
+    println(s"  /tasks/${task.id} (GET)")
+
     HttpRoutes.of[IO] {
       case GET -> Root / "packages" / pkg.id / "tasks" / task.id =>
         Ok(implicitly[Value[A]].requirements().asJson)
     }
+  }
 
   /** For decoding JSON environments in POST requests. */
   implicit val envDecoder: EntityDecoder[IO, Environment] =
@@ -66,7 +75,9 @@ object ApiRoutes {
   def taskExecutionRoute[A : Value, B : Value](
     pkg: Package, 
     task: Task[A, B]
-  ): HttpRoutes[IO] =
+  ): HttpRoutes[IO] = {
+    println(s"  /tasks/${task.id} (POST)")
+
     HttpRoutes.of[IO] {
       case req @ POST -> Root / "packages" / pkg.id / "tasks" / task.id =>
         for {
@@ -74,4 +85,5 @@ object ApiRoutes {
           res <- Ok(task.run(env, pkg.syntaxes).asJson)
         } yield res
     }
+  }
 }

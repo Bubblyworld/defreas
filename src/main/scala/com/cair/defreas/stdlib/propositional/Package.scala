@@ -6,7 +6,7 @@ import instances._
 
 object getPackage {
   def apply() =
-    Package("stdlib_prop")
+    Package("stdlib_propositional")
       .addSyntax(DefaultSyntax)
       .addTask(Tasks.printInt)
 }

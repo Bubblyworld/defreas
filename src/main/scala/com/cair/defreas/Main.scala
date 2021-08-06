@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext.global
 import com.cair.defreas.lsp._
 import com.cair.defreas.server.App
 import com.cair.defreas.types.Package
+import com.cair.defreas.stdlib.basic
 import com.cair.defreas.stdlib.propositional
 
 object Main extends IOApp {
@@ -48,5 +49,8 @@ object Main extends IOApp {
 
   /** Returns every package that the tool can find. */
   def getPackages(): List[Package] =
-    List(propositional.getPackage())
+    List(
+      basic.getPackage(),
+      propositional.getPackage()
+    )
 }
