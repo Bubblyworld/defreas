@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.global
 import com.cair.defreas.lsp._
 import com.cair.defreas.server.App
 import com.cair.defreas.types.Package
-import com.cair.defreas.logics.propositional
+import com.cair.defreas.stdlib.propositional
 
 object Main extends IOApp {
   val app: Resource[IO, Server[IO]] = {

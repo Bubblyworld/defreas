@@ -1,4 +1,4 @@
-package com.cair.defreas.logics.propositional
+package com.cair.defreas.stdlib.propositional
 
 import org.scalatest.flatspec._
 import org.scalatest.matchers._

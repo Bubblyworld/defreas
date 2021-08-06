@@ -1,4 +1,4 @@
-package com.cair.defreas.logics.propositional
+package com.cair.defreas.stdlib.propositional
 
 import com.cair.defreas.types._
 import com.cair.defreas.types.instances._
