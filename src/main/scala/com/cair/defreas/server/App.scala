@@ -10,10 +10,11 @@ import com.cair.defreas.types._
 object App {
   def apply(
     blocker: Blocker,
-    packages: List[Package]
+    packages: List[Package],
+    syntaxes: DependentMap[String, Syntax]
   )(implicit cs: ContextShift[IO]): HttpRoutes[IO] =
     List(
-      ApiRoutes(packages),
+      ApiRoutes(packages, syntaxes),
       StaticRoutes(blocker),
     ).flatten.reduce({ _.combineK(_) })
 }

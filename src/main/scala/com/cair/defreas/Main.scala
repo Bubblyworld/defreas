@@ -9,17 +9,20 @@ import scala.concurrent.ExecutionContext.global
 
 import com.cair.defreas.lsp._
 import com.cair.defreas.server.App
-import com.cair.defreas.types.Package
+import com.cair.defreas.types._
 import com.cair.defreas.stdlib.basic
 import com.cair.defreas.stdlib.propositional
 
 object Main extends IOApp {
   val app: Resource[IO, Server[IO]] = {
+    val pkgs = getPackages()
+    val syntaxes = getSyntaxes(pkgs)
+
     for {
       blocker <- Blocker[IO]
       server <- BlazeServerBuilder[IO](global)
         .bindHttp(8080, "localhost")
-        .withHttpApp(App(blocker, getPackages()).orNotFound)
+        .withHttpApp(App(blocker, pkgs, syntaxes).orNotFound)
         .resource
     } yield server
   }
@@ -53,4 +56,14 @@ object Main extends IOApp {
       basic.getPackage(),
       propositional.getPackage()
     )
+
+  /** Combines syntaxes from every package with namespacing. */
+  def getSyntaxes(pkgs: List[Package]): DependentMap[String, Syntax] =
+    pkgs.map(
+      pkg => pkg.syntaxes.map(
+        kv => (kv._1.map(
+          id => s"${pkg.id}/${id}"
+        ), kv._2)
+      )
+    ).reduce(_ ++ _) 
 }

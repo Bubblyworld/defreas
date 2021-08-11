@@ -9,6 +9,9 @@ sealed trait Key[K] {
 
   /** A tag for the type of the key's mapped typeclass instance. */
   val tag: TypeTag[_]
+
+  /** Maps the key's current identifier to a new one. */
+  def map(f: K => K): Key[K]
 }
 
 /** Represents a map of instances of F[L], where L is a universal logic type,
@@ -37,16 +40,28 @@ case class DependentMap[K, F[_]](
       .filter(_.tag.tpe == tag.tpe)
       .map(_.id)
 
+  def ++(map: DependentMap[K, F]): DependentMap[K, F] =
+    combine(map)
+
+  def combine(map: DependentMap[K, F]): DependentMap[K, F] =
+    DependentMap(data ++ map.data)
+
+  def map(f: ((Key[K], F[_])) => (Key[K], F[_])): DependentMap[K, F] =
+    DependentMap(data.map(f))
+
   private case class KeyImpl[A](id: K, tag: TypeTag[A]) extends Key[K] {
+    def map(f: K => K): Key[K] =
+      KeyImpl[A](f(id), tag)
+
     override def equals(that: Any): Boolean = {
       if (!that.isInstanceOf[KeyImpl[_]]) return false
   
       val key = that.asInstanceOf[KeyImpl[A]]
-      return id == key.id && tag.tpe == key.tag.tpe
+      return id == key.id && tag.tpe =:= key.tag.tpe
     }
   }
 }
 
 object DependentMap {
-  def empty[K, F[_]] = new DependentMap[K, F](Map.empty)
+  def empty[K, F[_]] = DependentMap[K, F](Map.empty)
 }

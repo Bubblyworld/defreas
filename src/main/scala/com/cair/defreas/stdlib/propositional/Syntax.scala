@@ -11,11 +11,12 @@ import instances._
 object DefaultSyntax extends Syntax[PropositionalLogic] with RegexParsers {
   val id = "default"
 
-  def parse(str: String): Either[ParseError, PropositionalLogic] =
+  def parse(str: String): Either[ParseError, PropositionalLogic] = {
     parse(phrase(wff), str) match {
       case _ : NoSuccess => Left(ParseError("parsing failure in standard"))
       case Success(formula, _) => Right(formula)
     }
+  }
 
   def print(formula: PropositionalLogic): String =
     formula.toString()

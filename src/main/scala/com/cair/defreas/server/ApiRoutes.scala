@@ -16,8 +16,11 @@ import com.cair.defreas.types._
 object ApiRoutes {
   val appVersion = "DefReas 0.0.1"
 
-  def apply(pkgs: List[Package]): List[HttpRoutes[IO]] = 
-    pkgs.flatMap(packageRoutes) :+ versionRoute()
+  def apply(
+    pkgs: List[Package],
+    syntaxes: DependentMap[String, Syntax]
+  ): List[HttpRoutes[IO]] = 
+    pkgs.flatMap(packageRoutes(_, syntaxes)) :+ versionRoute()
 
   /** Route that returns the version of the tool. */
   def versionRoute(): HttpRoutes[IO] = {
@@ -30,16 +33,23 @@ object ApiRoutes {
   }
 
   /** Combined routes for the given package. */
-  def packageRoutes(pkg: Package): List[HttpRoutes[IO]] = {
+  def packageRoutes(
+    pkg: Package,
+    syntaxes: DependentMap[String, Syntax]
+  ): List[HttpRoutes[IO]] = {
     println(s"/packages/${pkg.id}")
 
     return pkg
       .listTasks()
-      .flatMap(taskRoutes(pkg, _))
+      .flatMap(taskRoutes(pkg, syntaxes, _))
   }
 
   /** Combined routes for the given task. */
-  def taskRoutes(pkg: Package, taskID: String): List[HttpRoutes[IO]] =
+  def taskRoutes(
+    pkg: Package,
+    syntaxes: DependentMap[String, Syntax],
+    taskID: String
+  ): List[HttpRoutes[IO]] =
     return pkg.getTask(taskID) match {
       case Left(notFound) => List.empty
       case Right(taskWrapper) =>
@@ -47,8 +57,8 @@ object ApiRoutes {
           new Task.Handler[List[HttpRoutes[IO]]] {
             def handle[A : Value, B : Value](task: Task[A, B]) =
               List (
-                taskRequirementsRoute(pkg, task),
-                taskExecutionRoute(pkg, task)
+                taskRequirementsRoute(pkg, syntaxes, task),
+                taskExecutionRoute(pkg, syntaxes, task)
               )
           }
         )
@@ -57,6 +67,7 @@ object ApiRoutes {
   /** Route that provides input requirements for a task. */
   def taskRequirementsRoute[A : Value, B : Value](
     pkg: Package,
+    syntaxes: DependentMap[String, Syntax],
     task: Task[A, B]
   ): HttpRoutes[IO] = {
     println(s"  /tasks/${task.id} (GET)")
@@ -74,15 +85,21 @@ object ApiRoutes {
   /** Route that runs a task on given input. */
   def taskExecutionRoute[A : Value, B : Value](
     pkg: Package, 
+    syntaxes: DependentMap[String, Syntax],
     task: Task[A, B]
   ): HttpRoutes[IO] = {
     println(s"  /tasks/${task.id} (POST)")
+    // TODO: error with the way we're prefixing keys!
+    println(syntaxes.keys[String])
+    println(syntaxes.keys[Int])
 
     HttpRoutes.of[IO] {
       case req @ POST -> Root / "packages" / pkg.id / "tasks" / task.id =>
         for {
+          _ <- IO(println("here"))
           env <- req.as[Environment]
-          res <- Ok(task.run(env, pkg.syntaxes).asJson)
+          _ <- IO(println(env))
+          res <- Ok(task.run(env, syntaxes).asJson)
         } yield res
     }
   }
