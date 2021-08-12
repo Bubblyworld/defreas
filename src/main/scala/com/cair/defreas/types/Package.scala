@@ -14,11 +14,11 @@ sealed case class Package(
   syntaxes: DependentMap[String, Syntax],
 ) {
   /** Adds a Task instance to the package. */
-  def addTask(task: Task[_, _]): Package =
+  def addTask[A, B](task: Task[A, B]): Package =
     Package(id, tasks + (task.id -> task), syntaxes)
 
   /** Adds a Syntax instance to the package. */
-  def addSyntax(syntax: Syntax[_]): Package =
+  def addSyntax[A : TypeTag](syntax: Syntax[A]): Package =
     Package(id, tasks, syntaxes + (syntax.id -> syntax))
 
   /** Checks if there exists a Task with the given id in the package. */

@@ -83,4 +83,51 @@ class DependentMapSpec extends AnyFlatSpec with should.Matchers {
     // Negative checks:
     map.keys[Any].length should be(0)
   }
+
+  it should "allow for mapping over keys without losing data" in {
+    val map = DependentMap
+      .empty[String, TestF]
+      .add[String]("string_key1", TestF("value1"))
+      .add[String]("string_key2", TestF("value2"))
+      .add[Int]("int_key", TestF(3))
+      .map(
+        kv => (kv._1.map(
+          id => s"test/${id}"
+        ), kv._2)
+      )
+
+    // Positive checks:
+    var keys = map.keys[String]
+    keys.length shouldBe 2
+    keys should contain("test/string_key1")
+    keys should contain("test/string_key2")
+
+    keys = map.keys[Int]
+    keys.length shouldBe 1
+    keys should contain("test/int_key")
+
+    // Positive value checks:
+    map.get[String]("test/string_key1").get.value shouldBe "value1"
+    map.get[String]("test/string_key2").get.value shouldBe "value2"
+    map.get[Int]("test/int_key").get.value shouldBe 3
+  }
+
+  it should "correctly combine maps without losing data" in {
+    val map1 = DependentMap
+      .empty[String, TestF]
+      .add[String]("string_key1", TestF("value1"))
+
+    val map2 = DependentMap
+      .empty[String, TestF]
+      .add[String]("string_key2", TestF("value2"))
+
+    // Positive checks:
+    val map = map1 ++ map2
+    var keys = map.keys[String]
+    keys.length shouldBe 2
+    keys should contain("string_key1")
+    keys should contain("string_key2")
+    map.get[String]("string_key1").get.value shouldBe "value1"
+    map.get[String]("string_key2").get.value shouldBe "value2"
+  }
 }

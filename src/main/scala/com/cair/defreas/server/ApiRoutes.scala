@@ -89,9 +89,6 @@ object ApiRoutes {
     task: Task[A, B]
   ): HttpRoutes[IO] = {
     println(s"  /tasks/${task.id} (POST)")
-    // TODO: error with the way we're prefixing keys!
-    println(syntaxes.keys[String])
-    println(syntaxes.keys[Int])
 
     HttpRoutes.of[IO] {
       case req @ POST -> Root / "packages" / pkg.id / "tasks" / task.id =>
