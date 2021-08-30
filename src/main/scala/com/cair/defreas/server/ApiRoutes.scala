@@ -93,9 +93,7 @@ object ApiRoutes {
     HttpRoutes.of[IO] {
       case req @ POST -> Root / "packages" / pkg.id / "tasks" / task.id =>
         for {
-          _ <- IO(println("here"))
           env <- req.as[Environment]
-          _ <- IO(println(env))
           res <- Ok(task.run(env, syntaxes).asJson)
         } yield res
     }
