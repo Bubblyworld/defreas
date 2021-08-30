@@ -20,7 +20,10 @@ object ApiRoutes {
     pkgs: List[Package],
     syntaxes: DependentMap[String, Syntax]
   ): List[HttpRoutes[IO]] = 
-    pkgs.flatMap(packageRoutes(_, syntaxes)) :+ versionRoute()
+    pkgs.flatMap(packageRoutes(_, syntaxes)) :+ 
+      versionRoute() :+
+      packagesRoute(pkgs) :+
+      syntaxesRoute(syntaxes)
 
   /** Route that returns the version of the tool. */
   def versionRoute(): HttpRoutes[IO] = {
@@ -29,6 +32,33 @@ object ApiRoutes {
     HttpRoutes.of[IO] {
       case GET -> Root / "version" => 
         Ok(appVersion)
+    }
+  }
+
+  /** For encoding JSON lists. */
+  implicit val listEncoder = jsonEncoderOf[IO, List[String]]
+
+  /** Route that returns the list of known namespaced syntaxes. */
+  def syntaxesRoute(
+    syntaxes: DependentMap[String, Syntax]
+  ): HttpRoutes[IO] = {
+    println("/syntaxes (GET)")
+
+    HttpRoutes.of[IO] {
+      case GET -> Root / "syntaxes" => 
+        Ok(syntaxes.allKeys)
+    }
+  }
+
+  /** Route that returns the list of known packages. */
+  def packagesRoute(
+    pkgs: List[Package]
+  ): HttpRoutes[IO] = {
+    println("/packages (GET)")
+
+    HttpRoutes.of[IO] {
+      case GET -> Root / "packages" => 
+        Ok(pkgs.map(pkg => pkg.id))
     }
   }
 

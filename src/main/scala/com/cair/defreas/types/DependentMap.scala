@@ -40,6 +40,12 @@ case class DependentMap[K, F[_]](
       .filter(_.tag.tpe == tag.tpe)
       .map(_.id)
 
+  def allKeys: List[K] =
+    data
+      .keys
+      .toList
+      .map(_.id)
+
   def ++(map: DependentMap[K, F]): DependentMap[K, F] =
     combine(map)
 

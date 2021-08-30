@@ -84,6 +84,24 @@ class DependentMapSpec extends AnyFlatSpec with should.Matchers {
     map.keys[Any].length should be(0)
   }
 
+  it should "correctly list all keys" in {
+    val map = DependentMap
+      .empty[String, TestF]
+      .add[String]("string_key1", TestF("value1"))
+      .add[String]("string_key2", TestF("value2"))
+      .add[Int]("int_key", TestF(2))
+
+    // Positive checks:
+    val keys = map.allKeys
+    keys.length shouldBe 3
+    keys should contain("string_key1")
+    keys should contain("string_key2")
+    keys should contain("int_key")
+
+    // Negative checks:
+    map.keys[Any].length should be(0)
+  }
+
   it should "allow for mapping over keys without losing data" in {
     val map = DependentMap
       .empty[String, TestF]
