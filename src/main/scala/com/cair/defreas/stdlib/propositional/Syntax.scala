@@ -2,8 +2,9 @@ package com.cair.defreas.stdlib.propositional
 
 import scala.util.parsing.combinator._
 
-import com.cair.defreas.types._
 import instances._
+import com.cair.defreas.types._
+import com.cair.defreas.types.instances._
 
 /** Parser for a simple propositional logic syntax, in which atoms are
  *  represented by strings of uppercase characters, negation is represented

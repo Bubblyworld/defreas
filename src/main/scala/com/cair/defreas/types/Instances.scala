@@ -2,7 +2,7 @@ package com.cair.defreas.types
 
 import scala.reflect.runtime.universe._
 
-/** Predefined typeclass instances of Value, Syntax etcetera. */
+/** Predefined typeclass instances of Value. */
 object instances {
   implicit val booleanValue: Value[Boolean] =
     new Value[Boolean] {
@@ -62,6 +62,26 @@ object instances {
         syntaxes: DependentMap[String, Syntax]
       ) = 
         serialiseValue[Int](id, value, syntaxes)
+    }
+
+  implicit def logicValue[A](instance: Logic[A]): Value[A] =
+    new Value[A] {
+      val id = instance.id
+
+      def requirements() =
+        ValueEnvironment(id, "any")
+
+      def deserialise(
+        env: Environment,
+        syntaxes: DependentMap[String, Syntax]
+      ) =
+        ???
+
+      def serialise(
+        value: A,
+        syntaxes: DependentMap[String, Syntax]
+      ) = 
+        ???
     }
 
   /** Parses a value from the given environment using the specified syntax. */

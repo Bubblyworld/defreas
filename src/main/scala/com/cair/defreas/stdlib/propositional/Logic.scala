@@ -54,7 +54,7 @@ object PropositionalLogic {
 object instances {
   implicit val logicInstance: Logic[PropositionalLogic] =
     new Logic[PropositionalLogic] {
-      val id: String = "propositional_logic"
+      val id: String = "propositional"
     }
 }
 

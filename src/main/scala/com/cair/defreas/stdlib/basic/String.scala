@@ -6,6 +6,8 @@ import com.cair.defreas.types._
 object StringSyntax extends Syntax[String] {
   val id = "string"
 
+  val value = instances.stringValue
+
   def parse(str: String): Either[ParseError, String] =
     Right(str)
 

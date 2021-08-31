@@ -2,6 +2,7 @@ package com.cair.defreas.types
 
 /** A textual representation of values of A. */
 trait Syntax[A] extends SyntaxPrinter[A] with SyntaxParser[A] with Syntax.Wrapper {
+  /** Package-unique identifier of the syntax. */
   val id: String
 
   def unwrap(handler: Syntax.Handler): Unit =
