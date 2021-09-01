@@ -15,7 +15,19 @@ import * as Rpc from "./lib/rpc.js";
 
 // TODO TESTING REMOVE ME //
 let client = new Rpc.Client("http://localhost:8080");
-client.getTask("id", console.log, console.log);
+client.getTask("id", 
+  task => {
+    let value = task.inputSchema.decode({
+      fst: true,
+      snd: {
+        serial: "sb_std",
+        value: "true"
+      }
+    });
+
+    client.runTask(task, value, console.log, console.log);
+  }
+, console.log);
 ////////////////////////////
 
 // +---------------------------+

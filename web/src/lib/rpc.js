@@ -43,7 +43,7 @@ export class Client {
     this.send(req, body, onSuccess, onError);
   }
 
-  // Describes the task with the given id.
+  // Fetches an instance of the task with the given id.
   getTask(id, onSuccess, onError) {
     this.get("test", task => { // TODO
       let inputSchema, outputSchema;
@@ -63,6 +63,22 @@ export class Client {
       ));
     }, onError);
   }
+
+  // Runs the given task.
+  runTask(task, input, onSuccess, onError) {
+    if (!task.inputSchema.conforms(input)) {
+      onError(new Error(`Input value for task ${task.id} was malformed.`));
+      return;
+    }
+
+    this.post("test", JSON.stringify(input.toObject()), value => {
+      try {
+        onSuccess(task.outputSchema.decode(value));
+      } catch(err) {
+        onError(err);
+      }
+    }, onError);
+  }
 }
 
 // The types of values that can be passed as inputs/outputs to tasks.
@@ -75,6 +91,7 @@ const ValueTypes = Object.freeze({
 });
 
 // Values represent the inputs/outputs to tasks on the RPC server.
+// TODO use a type system, these typeof checks are tedious.
 class Value {
   constructor(type) {
     this.type = type;
@@ -90,6 +107,10 @@ export class BooleanValue extends Value {
     super(ValueTypes.BOOLEAN);
     this.value = value;
   }
+
+  toObject() {
+    return this.value;
+  }
 }
 
 export class IntegerValue extends Value {
@@ -101,6 +122,10 @@ export class IntegerValue extends Value {
     super(ValueTypes.INTEGER);
     this.value = value;
   }
+
+  toObject() {
+    return this.value;
+  }
 }
 
 export class StringValue extends Value {
@@ -111,6 +136,10 @@ export class StringValue extends Value {
 
     super(ValueTypes.STRING);
     this.value = value;
+  }
+
+  toObject() {
+    return this.value;
   }
 }
 
@@ -128,6 +157,13 @@ export class PairValue extends Value {
     this.fst = fst;
     this.snd = snd;
   }
+
+  toObject() {
+    return {
+      fst: this.fst.toObject(),
+      snd: this.snd.toObject()
+    };
+  }
 }
 
 export class SerialValue extends Value {
@@ -136,13 +172,20 @@ export class SerialValue extends Value {
       throw new Error(`First constructor argument for SerialValue should be string: ${typeof serial}`);
     }
 
-    if (typeof value !== "string") {
-      throw new Error(`Second constructor argument for SerialValue should be string: ${typeof value}`);
+    if (!(value instanceof StringValue)) {
+      throw new Error(`Second constructor argument for SerialValue should be a StringValue: ${value}`);
     }
 
     super(ValueTypes.SERIAL);
     this.serial = serial;
     this.value = value;
+  }
+
+  toObject() {
+    return {
+      serial: this.serial,
+      value: this.value.toObject()
+    };
   }
 }
 
@@ -179,10 +222,6 @@ class Schema {
         break;
     }
   }
-
-  conforms(value) {
-    return this.type === value.type;
-  }
 }
 
 class PrimitiveSchema extends Schema {
@@ -191,7 +230,24 @@ class PrimitiveSchema extends Schema {
   }
 
   conforms(value) {
-    return super.conforms(value);
+    return typeof value.value === this.type;
+  }
+
+  decode(obj) {
+    switch(this.type) {
+      case ValueTypes.BOOLEAN:
+        return new BooleanValue(obj);
+
+      case ValueTypes.STRING:
+        return new StringValue(obj);
+
+      case ValueTypes.INTEGER:
+        return new IntegerValue(obj);
+
+      default:
+        // TODO: Use a type system, this is gross.
+        throw new Error("IMPOSSIBLE SITUATION");
+    }
   }
 }
 
@@ -204,12 +260,19 @@ class PairSchema extends Schema {
   }
 
   conforms(value) {
-    if (!super.conforms(value)) {
+    if (value.type !== this.type) {
       return false;
     }
 
     return this.fstSchema.conforms(value.fst) 
       && this.sndSchema.conforms(value.snd);
+  }
+
+  decode(obj) {
+    return new PairValue(
+      this.fstSchema.decode(obj.fst),
+      this.sndSchema.decode(obj.snd)
+    )
   }
 }
 
@@ -222,11 +285,15 @@ class SerialSchema extends Schema {
   }
 
   conforms(value) {
-    if (!super.conforms(value)) {
+    if (value.type !== this.type) {
       return false;
     }
 
     return this.valueSchema.conforms(value.value);
+  }
+
+  decode(obj) {
+    return new SerialValue(obj.serial, this.valueSchema.decode(obj.value));
   }
 }
 
