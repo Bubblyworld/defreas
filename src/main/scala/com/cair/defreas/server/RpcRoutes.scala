@@ -9,23 +9,54 @@ import org.http4s.circe._
 
 import com.cair.defreas.rpc._
 
+case class SerialisedBoolean(value: Boolean)
+
 object RpcRoutes {
+  val serial = new Serial[SerialisedBoolean] {
+    val id = "sb_std"
+
+    def print(value: SerialisedBoolean) =
+      s"${value.value}"
+
+    def parse(str: String) =
+      str match {
+        case "true" => Some(SerialisedBoolean(true))
+        case "false" => Some(SerialisedBoolean(false))
+        case _ => None
+      }
+  }
+
+  val bValue = Value.boolean
+  val sbValue = Value.serial("serialised_boolean", serial)
+  val fn = (value: (Boolean, SerialisedBoolean)) =>
+    SerialisedBoolean(value._1 && value._2.value)
+
   val task = new Task(
     "boolean_and",
     "Returns the logical conjunction of the inputs.",
-    (value: (Boolean, Boolean)) => value._1 && value._2,
-    Value.pair(Value.boolean, Value.boolean),
-    Value.boolean
+    fn,
+    Value.pair(bValue, sbValue),
+    sbValue
   )
 
-  val reg = Registry.empty
+  val reg = Registry
+    .empty
+    .addSerial(serial)
+    .addTask(task)
 
   def apply(): List[HttpRoutes[IO]] = 
     List(
+      descriptionRoute(),
       inputSchemaRoute(),
       outputSchemaRoute(),
       runRoute(),
     )
+
+  def descriptionRoute() =
+    HttpRoutes.of[IO] {
+      case GET -> Root / "test" =>
+        task.httpDescription()
+    }
 
   def inputSchemaRoute() =
     HttpRoutes.of[IO] {

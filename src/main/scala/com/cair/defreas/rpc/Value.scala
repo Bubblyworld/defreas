@@ -17,7 +17,7 @@ sealed trait ValueCodec[A] extends Encoder[A] with Decoder[A]
 object Value {
   val boolean =
     new Value[Boolean] {
-      val schema = primitiveSchema("boolean", "A boolean literal.")
+      val schema = primitiveSchema("boolean", "A 'boolean' literal.")
 
       def codec(reg: Registry) =
         new ValueCodec[Boolean]{
@@ -31,7 +31,7 @@ object Value {
 
   val string =
     new Value[String] {
-      val schema = primitiveSchema("string", "A string literal.")
+      val schema = primitiveSchema("string", "A 'string' literal.")
 
       def codec(reg: Registry) =
         new ValueCodec[String] {
@@ -45,7 +45,7 @@ object Value {
 
   val integer =
     new Value[Integer] {
-      val schema = primitiveSchema("integer", "An integer literal.")
+      val schema = primitiveSchema("integer", "An 'integer' literal.")
 
       def codec(reg: Registry) =
         new ValueCodec[Integer] {
@@ -89,9 +89,9 @@ object Value {
       case class internal(fst: Json, snd: Json)
     }
 
-  def serial[A : TypeTag](serial: Serial[A]) =
+  def serial[A : TypeTag](id: String, serial: Serial[A]) =
     new Value[A] {
-      val schema = serialisableSchema(serial)
+      val schema = serialisableSchema(id, serial)
 
       def codec(reg: Registry) =
         new ValueCodec[A] {
@@ -126,20 +126,20 @@ object Value {
   def pairSchema[A, B](fst: Value[A], snd: Value[B]) =
     JsonObject
       .empty
-      .add("description", "A pair of values.".asJson)
+      .add("description", "A 'pair' of values.".asJson)
       .add("fst", fst.schema)
       .add("snd", snd.schema)
       .asJson
 
-  def serialisableSchema[A](serial: Serial[A]) =
+  def serialisableSchema[A](id: String, serial: Serial[A]) =
     JsonObject
       .empty
-      .add("description", s"A ${serial.id} value that can be decoded with a serial.".asJson)
-      .add("serial", s"The ID of the cserial to use for decoding.".asJson)
+      .add("description", s"A '${id}' value that can be encoded and decoded with a serial.".asJson)
+      .add("serial", s"The ID of the serial to use.".asJson)
       .add("value",
         primitiveSchema(
           "string",
-          s"A serialised representation of a ${serial.id} value."
+          s"A serialised representation of a '${id}' value."
         )
       ).asJson
 }
