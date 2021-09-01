@@ -16,5 +16,6 @@ object App {
     List(
       ApiRoutes(packages, syntaxes),
       StaticRoutes(blocker),
+      RpcRoutes(),
     ).flatten.reduce({ _.combineK(_) })
 }
