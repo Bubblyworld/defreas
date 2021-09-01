@@ -10,7 +10,15 @@ import "codemirror/addon/hint/show-hint";
 import "lsp-editor-adapter/lib/codemirror-lsp.css";
 import { LspWsConnection, CodeMirrorAdapter } from "lsp-editor-adapter";
 
-// +-----------------------------+
+// RPC client for the DefReas API server.
+import * as Rpc from "./lib/rpc.js";
+
+// TODO TESTING REMOVE ME //
+let client = new Rpc.Client("http://localhost:8080");
+client.getTask("id", console.log, console.log);
+////////////////////////////
+
+// +---------------------------+
 // |        INITIALISATION       |
 // +-----------------------------+
 

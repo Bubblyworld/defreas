@@ -126,6 +126,7 @@ object Value {
   def pairSchema[A, B](fst: Value[A], snd: Value[B]) =
     JsonObject
       .empty
+      .add("type", "pair".asJson)
       .add("description", "A 'pair' of values.".asJson)
       .add("fst", fst.schema)
       .add("snd", snd.schema)
@@ -134,6 +135,7 @@ object Value {
   def serialisableSchema[A](id: String, serial: Serial[A]) =
     JsonObject
       .empty
+      .add("type", "serial".asJson)
       .add("description", s"A '${id}' value that can be encoded and decoded with a serial.".asJson)
       .add("serial", s"The ID of the serial to use.".asJson)
       .add("value",
